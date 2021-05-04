@@ -20,7 +20,7 @@ class Recette
     /**
      * @ORM\Column(type="integer")
      */
-    private $temps_preparation;
+    private $tempsPreparation;
 
     /**
      * @ORM\Column(type="integer")
@@ -30,12 +30,12 @@ class Recette
     /**
      * @ORM\Column(type="integer")
      */
-    private $nb_personne;
+    private $nbPersonne;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $date_creation;
+    private $dateCreation;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -49,7 +49,7 @@ class Recette
 
     public function __construct()
     {
-        $this->date_creation = new \DateTime('now');
+        $this->dateCreation = new \DateTime('now');
     }
 
     public function getId(): ?int
@@ -59,12 +59,12 @@ class Recette
 
     public function getTempsPreparation(): ?int
     {
-        return $this->temps_preparation;
+        return $this->tempsPreparation;
     }
 
-    public function setTempsPreparation(int $temps_preparation): self
+    public function setTempsPreparation(int $tempsPreparation): self
     {
-        $this->temps_preparation = $temps_preparation;
+        $this->tempsPreparation = $tempsPreparation;
 
         return $this;
     }
@@ -83,24 +83,24 @@ class Recette
 
     public function getNbPersonne(): ?int
     {
-        return $this->nb_personne;
+        return $this->nbPersonne;
     }
 
-    public function setNbPersonne(int $nb_personne): self
+    public function setNbPersonne(int $nbPersonne): self
     {
-        $this->nb_personne = $nb_personne;
+        $this->nbPersonne = $nbPersonne;
 
         return $this;
     }
 
     public function getDateCreation(): ?\DateTimeInterface
     {
-        return $this->date_creation;
+        return $this->dateCreation;
     }
 
-    public function setDateCreation(\DateTimeInterface $date_creation): self
+    public function setDateCreation(\DateTimeInterface $dateCreation): self
     {
-        $this->date_creation = $date_creation;
+        $this->dateCreation = $dateCreation;
 
         return $this;
     }

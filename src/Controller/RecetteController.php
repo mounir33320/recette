@@ -6,17 +6,14 @@ namespace App\Controller;
 
 use App\Entity\Recette;
 use App\Repository\RecetteRepository;
-use Cassandra\Date;
+use App\Trait\SerializerTrait;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerInterface;
+
 
 class RecetteController extends AbstractController
 {
@@ -25,31 +22,17 @@ class RecetteController extends AbstractController
      */
     private $recetteRepository;
     /**
-     * @var JsonEncoder
+     * @var EntityManagerInterface
      */
-    private $jsonEncoder;
-    /**
-     * @var DateTimeNormalizer
-     */
-    private $dateTimeNormalizer;
-    /**
-     * @var ObjectNormalizer
-     */
-    private $objectNormalizer;
-    /**
-     * @var Serializer
-     */
-    private $serializer;
+    private $entityManager;
 
-    public function __construct(RecetteRepository $recetteRepository)
+    use SerializerTrait;
+
+
+    public function __construct(RecetteRepository $recetteRepository, EntityManagerInterface $entityManager)
     {
         $this->recetteRepository = $recetteRepository;
-
-        $this->jsonEncoder = new JsonEncoder();
-        $this->dateTimeNormalizer = new DateTimeNormalizer();
-        $this->objectNormalizer = new ObjectNormalizer();
-
-        $this->serializer = new Serializer([$this->dateTimeNormalizer,$this->objectNormalizer], [$this->jsonEncoder]);
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -60,10 +43,10 @@ class RecetteController extends AbstractController
     {
         $recettesList = $this->recetteRepository->findAll();
 
-        $recettesListSerialized = $this->serializer->serialize($recettesList, "json");
+        $recettesListSerialized = $this->serializer()->serialize($recettesList, "json");
 
         $response = new Response($recettesListSerialized);
-        $response->headers->set("Content-type","json");
+        $response->headers->set("Content-type","application/json");
 
         return $response;
     }
@@ -75,10 +58,10 @@ class RecetteController extends AbstractController
      */
     public function show(Recette $recette) : Response
     {
-        $recetteSerialized = $this->serializer->serialize($recette, "json");
+        $recetteSerialized = $this->serializer()->serialize($recette, "json");
 
         $response = new Response($recetteSerialized);
-        $response->headers->set("Content-type","json");
+        $response->headers->set("Content-type","application/json");
 
         return $response;
     }
@@ -91,14 +74,73 @@ class RecetteController extends AbstractController
     public function add(Request $request) : Response
     {
         $data = $request->getContent();
-        $dataDeserialized = $this->serializer->deserialize($data,Recette::class,"json");
+        $dataDeserialized = $this->serializer()->deserialize($data,Recette::class,"json");
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($dataDeserialized);
-        $entityManager->flush();
 
-        $dataArray = $this->serializer->normalize($dataDeserialized);
+        $this->entityManager->persist($dataDeserialized);
+        $this->entityManager->flush();
 
-        return new JsonResponse(["data"=>$dataArray,"message"=>"Success"]);
+        $dataArray = $this->serializer()->serialize(["data" => $dataDeserialized, "message" => "slkdkfhjslkfj"], "json");
+        $response = new Response($dataArray);
+        $response->headers->set("Content-type","application/json");
+
+        return $response;
     }
+
+    /**
+     * @Route("/recettes/{id}", name="recettes_update", methods={"PUT"})
+     * @param Recette $recette
+     * @return Response
+     */
+
+    public function update2(Recette $recette, Request $request)
+    {
+        $data = $request->getContent();
+        /**
+         * @var Recette $dataDeserialized
+         */
+        $dataDeserialized = $this->serializer()->deserialize($data, Recette::class, "json");
+
+        $recette->setCout($dataDeserialized->getCout());
+        $recette->setTempsPreparation($dataDeserialized->getTempsPreparation());
+        $recette->setNbPersonne($dataDeserialized->getNbPersonne());
+        $recette->setNom($dataDeserialized->getNom());
+        $recette->setPublic($dataDeserialized->getPublic());
+
+        $this->entityManager->flush();
+
+        $recetteNormalized = $this->serializer()->normalize($recette, "json");
+
+        return new JsonResponse(["data"=>$recetteNormalized,"message"=>"Success"]);
+
+        //dd($dataDeserialized);
+    }
+
+//    public function update(Recette $recette, Request $request)
+//    {
+//        $data = $request->getContent();
+//        $dataDeserialized = $this->serializer()->decode($data, "json");
+//
+//        foreach ($dataDeserialized as $key => $value)
+//        {
+//            $methode = "set".ucfirst($key);
+//            if(method_exists($recette, $methode))
+//            {
+//                $recette->$methode($value);
+//            }
+//            else
+//            {
+//                return new JsonResponse(["error" => "Cette propriété " . $methode . " n'existe pas"]);
+//            }
+//        }
+//
+//        $this->entityManager->flush();
+//        $recetteNormalized = $this->serializer()->normalize($recette, "json");
+//
+//        return new JsonResponse(["data"=>$recetteNormalized,"message"=>"Success"]);
+//
+//        //dd($recetteNormalized, $recette);
+//    }
+
+
 }
