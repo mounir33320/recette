@@ -1,5 +1,5 @@
 <?php
-namespace App\Trait;
+namespace App\Traits;
 
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
