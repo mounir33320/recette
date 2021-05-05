@@ -15,5 +15,10 @@ class ExceptionListener
             $jsonResponse = new JsonResponse(["message" => "Cette ressource n'existe pas."]);
             $exceptionEvent->setResponse($jsonResponse);
         }
+        else if(method_exists($throwable,"getStatusCode") && $throwable->getStatusCode() == 401)
+        {
+            $jsonResponse = new JsonResponse(["message" => "Vous devez vous authentifier pour voir ce contenu."]);
+            $exceptionEvent->setResponse($jsonResponse);
+        }
     }
 }

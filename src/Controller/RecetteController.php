@@ -40,9 +40,27 @@ class RecetteController extends AbstractController
      * @Route("/recettes", name="recettes_list", methods={"GET"})
      * @return Response
      */
-    public function index() : Response
+    public function index(Request $request) : Response
     {
-        $recettesList = $this->recetteRepository->findAll();
+        $currentUser= $this->getUser();
+        $paramsURL = $request->query->all();
+        $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
+
+
+        if($paramsURL != null && isset($paramsURL["order"]) && in_array(key($paramsURL["order"]), $keyFilters))
+        {
+            $criteria = $currentUser == null? ["public" => true] : [];
+        }
+
+        else if($currentUser)
+        {
+            $recettesList = $this->recetteRepository->findBy([], ["nom" => "asc"]);
+        }
+        else
+        {
+            $recettesList = $this->recetteRepository->findBy(["public" => true]);
+        }
+
 
         $recettesListSerialized = $this->serializer()->serialize($recettesList, "json");
 
@@ -50,6 +68,7 @@ class RecetteController extends AbstractController
         $response->headers->set("Content-type","application/json");
 
         return $response;
+
     }
 
     /**
@@ -59,16 +78,13 @@ class RecetteController extends AbstractController
      */
     public function show(Recette $recette) : Response
     {
-        try {
+
             $recetteSerialized = $this->serializer()->serialize($recette, "json");
 
             $response = new Response($recetteSerialized, Response::HTTP_OK);
             $response->headers->set("Content-type","application/json");
 
             return $response;
-        } catch (\Exception $exception) {
-            return new JsonResponse(["message" => $exception->getMessage()]);
-        }
 
     }
 
@@ -155,20 +171,15 @@ class RecetteController extends AbstractController
 
     /**
      * @Route("/recettes/{id}", name="recettes_delete", methods={"DELETE"})
-     * @param $id
+     * @param Recette $recette
      * @return JsonResponse
      */
-    public function delete($id) : JsonResponse
+    public function delete(Recette $recette) : JsonResponse
     {
-        $recette = $this->recetteRepository->find((int)$id);
 
-        if ($recette)
-        {
-            $this->entityManager->remove($recette);
-            $this->entityManager->flush();
-            return new JsonResponse(["message"=>"Success"],Response::HTTP_NO_CONTENT);
-        }
+        $this->entityManager->remove($recette);
+        $this->entityManager->flush();
+        return new JsonResponse(["message"=>"Success"],Response::HTTP_NO_CONTENT);
 
-        return new JsonResponse(["message"=>"Object not found"],Response::HTTP_NOT_FOUND);
     }
 }

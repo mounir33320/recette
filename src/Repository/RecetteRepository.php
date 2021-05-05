@@ -19,6 +19,17 @@ class RecetteRepository extends ServiceEntityRepository
         parent::__construct($registry, Recette::class);
     }
 
+    public function findPublicRecettes()
+    {
+        return $this->createQueryBuilder("r")
+                    ->andWhere("r.public = true")
+                    ->getQuery()
+                    ->getResult()
+                ;
+    }
+
+
+
     // /**
     //  * @return Recette[] Returns an array of Recette objects
     //  */
