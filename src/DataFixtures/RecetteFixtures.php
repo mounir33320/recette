@@ -10,35 +10,19 @@ class RecetteFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        $recette = new Recette();
+        for ($i=0; $i<=50; $i++)
+        {
+            $recette = new Recette();
 
-        $recette->setNom("Blanquette")
-                ->setTempsPreparation(30)
-                ->setCout(15)
+            $recette->setNom("Recette " . $i)
+                ->setTempsPreparation(10 + $i+1)
+                ->setCout(5 + $i)
                 ->setNbPersonne(4)
                 ->setPublic(true);
 
+            $manager->persist($recette);
+        }
 
-        $recette2 = new Recette();
-
-        $recette2->setNom("Tartiflette")
-                ->setTempsPreparation(45)
-                ->setCout(30)
-                ->setNbPersonne(6)
-                ->setPublic(false);
-
-
-        $recette3 = new Recette();
-
-        $recette3->setNom("Tajine")
-                ->setTempsPreparation(120)
-                ->setCout(60)
-                ->setNbPersonne(10)
-                ->setPublic(false);
-
-        $manager->persist($recette);
-        $manager->persist($recette2);
-        $manager->persist($recette3);
         $manager->flush();
     }
 }

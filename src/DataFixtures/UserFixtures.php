@@ -22,12 +22,12 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-       $user = new User();
+       /*$user = new User();
        $user->setEmail("toto@toto.fr")
             ->setRoles(["ROLE_USER"])
             ->setPassword($this->userPasswordEncoder->encodePassword($user, "toto"));
 
        $manager->persist($user);
-       $manager->flush();
+       $manager->flush();*/
     }
 }

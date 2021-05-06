@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Recette;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -26,6 +27,27 @@ class RecetteRepository extends ServiceEntityRepository
                     ->getQuery()
                     ->getResult()
                 ;
+    }
+
+    public function findAllRecettesPaginated($criteria,$orderBy,$page,$limit)
+    {
+        $queryBuilder = $this->createQueryBuilder("r");
+        foreach ($criteria as $key => $value) {
+            $queryBuilder->andWhere("r.{$key} = '{$value}'");
+        }
+
+        foreach ($orderBy as $key => $value) {
+            $queryBuilder->addOrderBy("r.{$key}",$value);
+        }
+
+        $query = $queryBuilder->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+        ;
+
+        return $query->getResult();
+
+        //return new Paginator($query);
     }
 
 

@@ -44,25 +44,34 @@ class RecetteController extends AbstractController
     public function index(Request $request) : Response
     {
         $currentUser= $this->getUser();
+
         $paramsURL = $request->query->all();
-        $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
+        $page = (isset($paramsURL["page"]) && $paramsURL["page"] >=0) ? (int)$paramsURL["page"] : 1;
+        $limit = (isset($paramsURL["limit"]) && $paramsURL["limit"] >=0) ? (int)$paramsURL["limit"] : 3;
+        $orderBy = [] ;
 
         $criteria = $currentUser == null ? ["public" => true] : [];
-        $orderBy = ["nom" => "asc"];
 
-        if($paramsURL != null &&
-            isset($paramsURL["order"]) &&
-            in_array(key($paramsURL["order"]), $keyFilters))
+        $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
+
+        // On vérifie que les clés et les valeurs des paramètres orderBy sont valides
+        if(isset($paramsURL["orderBy"]))
         {
-            $keyOrder = key($paramsURL["order"]);
-            if($paramsURL["order"][$keyOrder] == "asc" ||
-                $paramsURL["order"][$keyOrder] == "desc")
+            foreach ($paramsURL["orderBy"] as $key => $value)
             {
-                $orderBy = $paramsURL["order"];
+                if(in_array($key, $keyFilters) && in_array(strtoupper($value), ["ASC","DESC"]))
+                {
+                    $orderBy[$key] = $value;
+                }
             }
         }
 
-        $recettesList = $this->recetteRepository->findBy($criteria,$orderBy);
+        if (empty($orderBy)) {
+            $orderBy = ["nom" => "asc"];
+        }
+
+        $recettesList = $this->recetteRepository->findAllRecettesPaginated($criteria,$orderBy,$page,$limit);
+
         $recettesListSerialized = $this->serializer()->serialize($recettesList, "json");
 
         $response = new Response($recettesListSerialized, Response::HTTP_OK);
