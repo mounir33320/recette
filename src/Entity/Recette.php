@@ -47,6 +47,12 @@ class Recette
      */
     private $public;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recettes")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
     public function __construct()
     {
         $this->dateCreation = new \DateTime('now');
@@ -125,6 +131,18 @@ class Recette
     public function setPublic(bool $public): self
     {
         $this->public = $public;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

@@ -3,25 +3,35 @@
 namespace App\DataFixtures;
 
 use App\Entity\Recette;
+use App\Repository\UserRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
 class RecetteFixtures extends Fixture
 {
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
+
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
     public function load(ObjectManager $manager)
     {
-        for ($i=0; $i<=50; $i++)
-        {
-            $recette = new Recette();
+        $user = $this->userRepository->find(1);
+        $recette = new Recette();
 
-            $recette->setNom("Recette " . $i)
-                ->setTempsPreparation(10 + $i+1)
-                ->setCout(5 + $i)
-                ->setNbPersonne(4)
-                ->setPublic(true);
+        $recette->setNom("Gâteau au chocolat")
+            ->setTempsPreparation(45)
+            ->setCout(10)
+            ->setNbPersonne(4)
+            ->setPublic(true)
+            ->setUser($user);
 
-            $manager->persist($recette);
-        }
+        $manager->persist($recette);
 
         $manager->flush();
     }

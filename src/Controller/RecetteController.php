@@ -72,6 +72,7 @@ class RecetteController extends AbstractController
 
         $recettesList = $this->recetteRepository->findAllRecettesPaginated($criteria,$orderBy,$page,$limit);
 
+        dd($recettesList);
         $recettesListSerialized = $this->serializer()->serialize($recettesList, "json");
 
         $response = new Response($recettesListSerialized, Response::HTTP_OK);
