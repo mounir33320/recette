@@ -38,6 +38,7 @@ class RecetteController extends AbstractController
 
     /**
      * @Route("/recettes", name="recettes_list", methods={"GET"})
+     * @param Request $request
      * @return Response
      */
     public function index(Request $request) : Response
@@ -46,22 +47,22 @@ class RecetteController extends AbstractController
         $paramsURL = $request->query->all();
         $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
 
+        $criteria = $currentUser == null ? ["public" => true] : [];
+        $orderBy = ["nom" => "asc"];
 
-        if($paramsURL != null && isset($paramsURL["order"]) && in_array(key($paramsURL["order"]), $keyFilters))
+        if($paramsURL != null &&
+            isset($paramsURL["order"]) &&
+            in_array(key($paramsURL["order"]), $keyFilters))
         {
-            $criteria = $currentUser == null? ["public" => true] : [];
+            $keyOrder = key($paramsURL["order"]);
+            if($paramsURL["order"][$keyOrder] == "asc" ||
+                $paramsURL["order"][$keyOrder] == "desc")
+            {
+                $orderBy = $paramsURL["order"];
+            }
         }
 
-        else if($currentUser)
-        {
-            $recettesList = $this->recetteRepository->findBy([], ["nom" => "asc"]);
-        }
-        else
-        {
-            $recettesList = $this->recetteRepository->findBy(["public" => true]);
-        }
-
-
+        $recettesList = $this->recetteRepository->findBy($criteria,$orderBy);
         $recettesListSerialized = $this->serializer()->serialize($recettesList, "json");
 
         $response = new Response($recettesListSerialized, Response::HTTP_OK);

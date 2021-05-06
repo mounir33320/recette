@@ -8,14 +8,20 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-class SecutityController extends AbstractController
+class SecurityController extends AbstractController
 {
     /**
-     * @Route("/login", name="login")
+     * @Route("/login", name="login", methods="POST")
+     * @param AuthenticationUtils $authenticationUtils
+     * @return JsonResponse
      */
     public function logIn(AuthenticationUtils $authenticationUtils):JsonResponse
     {
         $error = $authenticationUtils->getLastAuthenticationError();
-        return new JsonResponse(["toto" => "toto"]);
+        $loggedUser = $this->getUser();
+        return new JsonResponse([
+            "username" => $loggedUser->getUsername(),
+            "roles" => $loggedUser->getRoles()
+            ]);
     }
 }
