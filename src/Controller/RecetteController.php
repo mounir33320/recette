@@ -52,13 +52,18 @@ class RecetteController extends AbstractController
     public function index(Request $request) : Response
     {
         $currentUser= $this->getUser();
+
+//        if($user != $recette->getUser()){
+//            throw new UnauthorizedHttpException(null);
+//        }
+
         $context = ["groups" => ["read:recette"]];
         $paramsURL = $request->query->all();
         $page = (isset($paramsURL["page"]) && $paramsURL["page"] >=0) ? (int)$paramsURL["page"] : 1;
         $limit = (isset($paramsURL["limit"]) && $paramsURL["limit"] >=0) ? (int)$paramsURL["limit"] : 3;
-        $orderBy = [] ;
+        $orderBy = [];
 
-        $criteria = $currentUser == null ? ["public" => true] : [];
+        $criteria = [];
 
         $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
 
@@ -78,7 +83,7 @@ class RecetteController extends AbstractController
             $orderBy = ["nom" => "asc"];
         }
 
-        $recettesList = $this->recetteRepository->findAllRecettesPaginated($criteria,$orderBy,$page,$limit);
+        $recettesList = $this->recetteRepository->findAllRecettesPaginated($criteria,$orderBy,$page,$limit,$currentUser);
 
         $recettesListSerialized = $this->serializer()->serialize($recettesList, "json", $context);
 

@@ -29,12 +29,20 @@ class RecetteRepository extends ServiceEntityRepository
                 ;
     }
 
-    public function findAllRecettesPaginated($criteria,$orderBy,$page,$limit)
+    public function findAllRecettesPaginated($criteria,$orderBy,$page,$limit,$user)
     {
+
         $queryBuilder = $this->createQueryBuilder("r");
-        foreach ($criteria as $key => $value) {
-            $queryBuilder->andWhere("r.{$key} = '{$value}'");
-        }
+        $queryBuilder->innerJoin("r.user", "u")
+                    ->orWhere(
+                        $queryBuilder->expr()->eq('r.public', true),
+                        $user == null? null : $queryBuilder->expr()->eq('r.user', $user->getId())
+                    );
+
+
+//        foreach ($criteria as $key => $value) {
+//            $queryBuilder->andWhere("r.{$key} = '{$value}'");
+//        }
 
         foreach ($orderBy as $key => $value) {
             $queryBuilder->addOrderBy("r.{$key}",$value);
@@ -46,7 +54,6 @@ class RecetteRepository extends ServiceEntityRepository
         ;
 
         return $query->getResult();
-
         //return new Paginator($query);
     }
 
