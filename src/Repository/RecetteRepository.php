@@ -39,7 +39,10 @@ class RecetteRepository extends ServiceEntityRepository
                         $user == null? null : $queryBuilder->expr()->eq('r.user', $user->getId())
                     );
 
-
+        if($criteria != null){
+            $queryBuilder->andWhere("r.nom LIKE :nom")
+                ->setParameter("nom", "%$criteria%");
+        }
 //        foreach ($criteria as $key => $value) {
 //            $queryBuilder->andWhere("r.{$key} = '{$value}'");
 //        }

@@ -61,6 +61,7 @@ class RecetteController extends AbstractController
         $paramsURL = $request->query->all();
         $page = (isset($paramsURL["page"]) && $paramsURL["page"] >=0) ? (int)$paramsURL["page"] : 1;
         $limit = (isset($paramsURL["limit"]) && $paramsURL["limit"] >=0) ? (int)$paramsURL["limit"] : 3;
+        $query = isset($paramsURL["query"]) && $paramsURL["query"] != "" ? $paramsURL["query"] : null;
         $orderBy = [];
 
         $criteria = [];
@@ -83,7 +84,7 @@ class RecetteController extends AbstractController
             $orderBy = ["nom" => "asc"];
         }
 
-        $recettesList = $this->recetteRepository->findAllRecettesPaginated($criteria,$orderBy,$page,$limit,$currentUser);
+        $recettesList = $this->recetteRepository->findAllRecettesPaginated($query,$orderBy,$page,$limit,$currentUser);
 
         $recettesListSerialized = $this->serializer()->serialize($recettesList, "json", $context);
 
