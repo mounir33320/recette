@@ -50,7 +50,7 @@ class RecetteController extends AbstractController
     public function index(Request $request) : Response
     {
         $currentUser= $this->getUser();
-
+        $context = ["groups" => ["read:recette"]];
         $paramsURL = $request->query->all();
         $page = (isset($paramsURL["page"]) && $paramsURL["page"] >=0) ? (int)$paramsURL["page"] : 1;
         $limit = (isset($paramsURL["limit"]) && $paramsURL["limit"] >=0) ? (int)$paramsURL["limit"] : 3;
@@ -78,8 +78,7 @@ class RecetteController extends AbstractController
 
         $recettesList = $this->recetteRepository->findAllRecettesPaginated($criteria,$orderBy,$page,$limit);
 
-        dd($recettesList);
-        $recettesListSerialized = $this->serializer()->serialize($recettesList, "json");
+        $recettesListSerialized = $this->serializer()->serialize($recettesList, "json", $context);
 
         $response = new Response($recettesListSerialized, Response::HTTP_OK);
         $response->headers->set("Content-type","application/json");
@@ -96,7 +95,8 @@ class RecetteController extends AbstractController
     public function show(Recette $recette) : Response
     {
 
-            $recetteSerialized = $this->serializer()->serialize($recette, "json");
+            $context = ["groups" => ["read:recette"]];
+            $recetteSerialized = $this->serializer()->serialize($recette, "json", $context);
 
             $response = new Response($recetteSerialized, Response::HTTP_OK);
             $response->headers->set("Content-type","application/json");
@@ -115,12 +115,7 @@ class RecetteController extends AbstractController
         $user = $this->getUser();
         $data = $request->getContent();
         $dataDecode = $this->serializer()->decode($data,"json");
-        $context = ["circular_reference_handler" => function($object){
-            if($object instanceof Categorie || $object instanceof Recette){
-                return $object->getNom();
-            }
-            return $object->getUsername();
-        }];
+        $context = ["groups" => ["read:recette"]];
 
         $recette = new Recette();
         $recette->setNom($dataDecode["nom"])
@@ -167,21 +162,41 @@ class RecetteController extends AbstractController
 
     public function update(Recette $recette, Request $request) : JsonResponse
     {
+        $context = ["groups" => ["read:recette"]];
         $data = $request->getContent();
         /**
          * @var Recette $dataDeserialized
          */
-        $dataDeserialized = $this->serializer()->deserialize($data, Recette::class, "json");
+        $dataDeserialized = $this->serializer()->decode($data, "json");
 
-        $recette->setCout($dataDeserialized->getCout());
-        $recette->setTempsPreparation($dataDeserialized->getTempsPreparation());
-        $recette->setNbPersonne($dataDeserialized->getNbPersonne());
-        $recette->setNom($dataDeserialized->getNom());
-        $recette->setPublic($dataDeserialized->getPublic());
+        $recette->setCout($dataDeserialized["cout"]);
+        $recette->setTempsPreparation($dataDeserialized["tempsPreparation"]);
+        $recette->setNbPersonne($dataDeserialized["nbPersonne"]);
+        $recette->setNom($dataDeserialized["nom"]);
+        $recette->setPublic($dataDeserialized["public"]);
+
+        $recetteCategories = $recette->getCategories();
+        foreach ($recetteCategories as $category){
+            $recette->removeCategory($category);
+        }
+        foreach ($dataDeserialized["categories"] as $value){
+            //methode 1
+            //$categories = $this->categorieRepository->find($value);
+
+            //methode 2
+            /**
+             * @var Categorie $checkCategorieInDb
+             */
+            $checkCategorieInDb = $this->entityManager->find(Categorie::class, $value);
+            if($checkCategorieInDb!= null){
+                $recette->addCategory($checkCategorieInDb);
+            }
+        }
+
 
         $this->entityManager->flush();
 
-        $recetteNormalized = $this->serializer()->normalize($recette, "json");
+        $recetteNormalized = $this->serializer()->normalize($recette, "json", $context);
 
         return new JsonResponse(["data"=>$recetteNormalized,"message"=>"Success"],Response::HTTP_OK);
     }
@@ -195,24 +210,52 @@ class RecetteController extends AbstractController
      */
     public function partialUpdate(Recette $recette, Request $request): JsonResponse
     {
+        $context = ["groups" => ["read:recette"]];
         $data = $request->getContent();
         $dataDeserialized = $this->serializer()->decode($data, "json");
 
         foreach ($dataDeserialized as $key => $value)
         {
-            $methode = "set".ucfirst($key);
-            if(method_exists($recette, $methode))
+
+            $methodeSet = "set".ucfirst($key);
+
+            if(method_exists($recette, $methodeSet))
             {
-                $recette->$methode($value);
+                $recette->$methodeSet($value);
             }
+            //pour gérer catégories
+//            else if(!method_exists($recette, $methodeSet)) {
+//                switch ($key) {
+//                    case "categories" :
+//
+//                        $recetteCategories = $recette->getCategories();
+//                        foreach ($recetteCategories as $category) {
+//                            $recette->removeCategory($category);
+//                        }
+//
+//                        foreach ($value as $category) {
+//
+//                            /**
+//                             * @var Categorie $checkCategorieInDb
+//                             */
+//                            $checkCategorieInDb = $this->entityManager->find(Categorie::class, $category);
+//                            if ($checkCategorieInDb != null) {
+//                                $recette->addCategory($checkCategorieInDb);
+//                            }
+//
+//                            break;
+//
+//                        }
+//                }
+//            }
             else
             {
-                return new JsonResponse(["error" => "Cette propriété " . $methode . " n'existe pas"],Response::HTTP_NOT_FOUND);
+                return new JsonResponse(["error" => "Cette propriété n'existe pas"],Response::HTTP_NOT_FOUND);
             }
         }
 
         $this->entityManager->flush();
-        $recetteNormalized = $this->serializer()->normalize($recette, "json");
+        $recetteNormalized = $this->serializer()->normalize($recette, "json", $context);
 
         return new JsonResponse(["data"=>$recetteNormalized,"message"=>"Success"],Response::HTTP_OK);
     }

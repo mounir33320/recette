@@ -6,6 +6,7 @@ use App\Repository\RecetteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=RecetteRepository::class)
@@ -16,47 +17,56 @@ class Recette
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"read:recette"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"read:recette"})
      */
     private $tempsPreparation;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"read:recette"})
      */
     private $cout;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"read:recette"})
      */
     private $nbPersonne;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"read:recette"})
      */
     private $dateCreation;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read:recette"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"read:recette"})
      */
     private $public;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recettes")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"read:recette"})
      */
     private $user;
 
     /**
      * @ORM\ManyToMany(targetEntity=Categorie::class, mappedBy="recettes")
+     * @Groups({"read:recette"})
      */
     private $categories;
 
