@@ -4,7 +4,9 @@
 namespace App\Controller;
 
 
+use App\Entity\Categorie;
 use App\Entity\Recette;
+use App\Repository\CategorieRepository;
 use App\Repository\RecetteRepository;
 use App\Traits\SerializerTrait;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,14 +28,18 @@ class RecetteController extends AbstractController
      * @var EntityManagerInterface
      */
     private $entityManager;
+    private $categorieRepository;
 
     use SerializerTrait;
 
 
-    public function __construct(RecetteRepository $recetteRepository, EntityManagerInterface $entityManager)
+    public function __construct(RecetteRepository $recetteRepository,
+                                EntityManagerInterface $entityManager,
+                                CategorieRepository $categorieRepository)
     {
         $this->recetteRepository = $recetteRepository;
         $this->entityManager = $entityManager;
+        $this->categorieRepository = $categorieRepository;
     }
 
     /**
@@ -106,14 +112,45 @@ class RecetteController extends AbstractController
      */
     public function add(Request $request) : Response
     {
+        $user = $this->getUser();
         $data = $request->getContent();
-        $dataDeserialized = $this->serializer()->deserialize($data,Recette::class,"json");
+        $dataDecode = $this->serializer()->decode($data,"json");
+        $context = ["circular_reference_handler" => function($object){
+            if($object instanceof Categorie || $object instanceof Recette){
+                return $object->getNom();
+            }
+            return $object->getUsername();
+        }];
+
+        $recette = new Recette();
+        $recette->setNom($dataDecode["nom"])
+                ->setNbPersonne($dataDecode["nbPersonne"])
+                ->setTempsPreparation($dataDecode["tempsPreparation"])
+                ->setPublic($dataDecode["public"])
+                ->setCout($dataDecode["cout"])
+                ->setUser($user);
 
 
-        $this->entityManager->persist($dataDeserialized);
+        foreach ($dataDecode["categories"] as $value){
+            //methode 1
+            //$categories = $this->categorieRepository->find($value);
+
+            //methode 2
+            /**
+             * @var Categorie $checkCategorieInDb
+             */
+            $checkCategorieInDb = $this->entityManager->find(Categorie::class, $value);
+            if($checkCategorieInDb!= null){
+                $recette->addCategory($checkCategorieInDb);
+            }
+        }
+
+        //dd($recette);
+
+        $this->entityManager->persist($recette);
         $this->entityManager->flush();
 
-        $dataJson = $this->serializer()->serialize(["data" => $dataDeserialized, "message" => "Success"], "json");
+        $dataJson = $this->serializer()->serialize(["data" => $recette, "message" => "Success"], "json", $context);
         $response = new Response($dataJson,Response::HTTP_CREATED);
         $response->headers->set("Content-type","application/json");
 
