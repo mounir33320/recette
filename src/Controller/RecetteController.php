@@ -14,8 +14,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 class RecetteController extends AbstractController
@@ -109,6 +111,7 @@ class RecetteController extends AbstractController
      * @Route("/recettes", name="recettes_add", methods={"POST"})
      * @param Request $request
      * @return Response
+     * @IsGranted("ROLE_USER")
      */
     public function add(Request $request) : Response
     {
@@ -158,10 +161,17 @@ class RecetteController extends AbstractController
      * @param Request $request
      * @return Response
      * @throws ExceptionInterface
+     * @IsGranted("ROLE_USER")
      */
 
     public function update(Recette $recette, Request $request) : JsonResponse
     {
+        $user = $this->getUser();
+
+        if($user != $recette->getUser()){
+            throw new UnauthorizedHttpException(null);
+        }
+
         $context = ["groups" => ["read:recette"]];
         $data = $request->getContent();
         /**
@@ -207,9 +217,16 @@ class RecetteController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      * @throws ExceptionInterface
+     * @IsGranted("ROLE_USER")
      */
     public function partialUpdate(Recette $recette, Request $request): JsonResponse
     {
+        $user = $this->getUser();
+
+        if($user != $recette->getUser()){
+            throw new UnauthorizedHttpException(null);
+        }
+
         $context = ["groups" => ["read:recette"]];
         $data = $request->getContent();
         $dataDeserialized = $this->serializer()->decode($data, "json");

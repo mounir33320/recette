@@ -21,14 +21,14 @@ class CategorieFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-       $categorie = new Categorie();
-       $recette = $this->recetteRepository->find(1);
-
-       $categorie->setNom("Oriental")
-                 ->addRecette($recette);
-
-        $manager->persist($categorie);
-
-        $manager->flush();
+//       $categorie = new Categorie();
+//       $recette = $this->recetteRepository->find(1);
+//
+//       $categorie->setNom("Oriental")
+//                 ->addRecette($recette);
+//
+//        $manager->persist($categorie);
+//
+//        $manager->flush();
     }
 }
