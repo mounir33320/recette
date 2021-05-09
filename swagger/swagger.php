@@ -2,7 +2,7 @@
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\Info(title="API Tutoriel", version="1")
+ * @OA\Info(title="API Recette", version="1", description="Cette API participative permet de partager des recettes entre utilisateurs.")
  *
  * @OA\Server(
  *     url="https://localhost:8000",

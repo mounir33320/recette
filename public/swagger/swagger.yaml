@@ -1,6 +1,7 @@
 openapi: 3.0.0
 info:
-  title: 'API Tutoriel'
+  title: 'API Recette'
+  description: 'Cette API participative permet de partager des recettes entre utilisateurs.'
   version: '1'
 servers:
   -
@@ -11,6 +12,7 @@ paths:
     get:
       tags:
         - Recette
+      summary: 'Collection of Recette'
       description: 'Get a collection of Recette'
       operationId: 'App\Controller\RecetteController::index'
       parameters:
@@ -42,6 +44,7 @@ paths:
     post:
       tags:
         - Recette
+      summary: 'Add an item Recette'
       description: 'Create an item of Recette'
       operationId: 'App\Controller\RecetteController::add'
       requestBody:
@@ -87,6 +90,7 @@ paths:
     get:
       tags:
         - Recette
+      summary: 'Item of Recette'
       description: 'Get an item of Recette'
       operationId: 'App\Controller\RecetteController::show'
       parameters:
@@ -111,6 +115,7 @@ paths:
     put:
       tags:
         - Recette
+      summary: 'Update an item Recette'
       description: 'Update an item of recette'
       operationId: 'App\Controller\RecetteController::update'
       parameters:
@@ -158,6 +163,7 @@ paths:
     delete:
       tags:
         - Recette
+      summary: 'Delete an item Recette'
       description: 'Delete an item of Recette'
       operationId: 'App\Controller\RecetteController::delete'
       parameters:
@@ -181,7 +187,8 @@ paths:
     patch:
       tags:
         - Recette
-      description: 'Update an item of recette'
+      summary: 'Update partially an item Recette'
+      description: 'Update partially an item of recette'
       operationId: 'App\Controller\RecetteController::partialUpdate'
       parameters:
         -
@@ -234,9 +241,10 @@ paths:
               properties:
                 username:
                   type: string
-                  example: john@doe.fr
+                  example: toto@toto.fr
                 password:
                   type: string
+                  example: toto
               type: object
       responses:
         '200':

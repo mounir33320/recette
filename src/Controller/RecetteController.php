@@ -49,6 +49,7 @@ class RecetteController extends AbstractController
      * @OA\Get(
      *     tags={"Recette"},
      *     path="/recettes",
+     *     summary="Collection of Recette",
      *     description="Get a collection of Recette",
      *     @OA\Parameter(ref="#/components/parameters/orderBy[nom]"),
      *     @OA\Parameter(ref="#/components/parameters/orderBy[cout]"),
@@ -122,6 +123,7 @@ class RecetteController extends AbstractController
      *  @OA\Get(
      *     tags={"Recette"},
      *     path="/recettes/{id}",
+     *     summary="Item of Recette",
      *     description="Get an item of Recette",
      *     @OA\Parameter(
      *          name="id",
@@ -165,6 +167,7 @@ class RecetteController extends AbstractController
      * @OA\Post(
      *     tags={"Recette"},
      *     path="/recettes",
+     *     summary="Add an item Recette",
      *     description="Create an item of Recette",
      *     @OA\RequestBody(
      *          required=true,
@@ -250,6 +253,7 @@ class RecetteController extends AbstractController
      * @OA\Put(
      *     tags={"Recette"},
      *     path="/recettes/{id}",
+     *     summary="Update an item Recette",
      *     description="Update an item of recette",
      *     @OA\Parameter(
      *          name="id",
@@ -343,7 +347,8 @@ class RecetteController extends AbstractController
     /**
      * @OA\Patch (
      *     tags={"Recette"},
-     *     description="Update an item of recette",
+     *     summary="Update partially an item Recette",
+     *     description="Update partially an item of recette",
      *     path="/recettes/{id}",
      *     @OA\Parameter(
      *          name="id",
@@ -447,6 +452,7 @@ class RecetteController extends AbstractController
      * @OA\Delete(
      *     tags={"Recette"},
      *     path="/recettes/{id}",
+     *     summary="Delete an item Recette",
      *     description="Delete an item of Recette",
      *     @OA\Parameter(
      *          name="id",

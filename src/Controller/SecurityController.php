@@ -19,8 +19,8 @@ class SecurityController extends AbstractController
      *          required=true,
      *          @OA\JsonContent(
      *              required={"username", "password"},
-     *              @OA\Property(property="username", type="string", example="john@doe.fr"),
-     *              @OA\Property(property="password", type="string")
+     *              @OA\Property(property="username", type="string", example="toto@toto.fr"),
+     *              @OA\Property(property="password", type="string", example="toto")
      *          )
      *     ),
      *     @OA\Response(
