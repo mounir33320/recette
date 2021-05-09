@@ -19,7 +19,7 @@ class ExceptionListener
         }
         else if(method_exists($throwable,"getStatusCode") && $throwable->getStatusCode() == 401)
         {
-            $jsonResponse = new JsonResponse(["message" => "Vous devez vous authentifier pour voir ce contenu."]);
+            $jsonResponse = new JsonResponse(["message" => "Vous devez être authentifié"]);
             $exceptionEvent->setResponse($jsonResponse);
         }
     }

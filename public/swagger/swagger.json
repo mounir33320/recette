@@ -1,0 +1,13 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Tutoriel",
+        "version": "1"
+    },
+    "servers": [
+        {
+            "url": "https://localhost:8000",
+            "description": "Mon API"
+        }
+    ]
+}

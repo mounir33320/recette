@@ -20,7 +20,8 @@
         "symfony/proxy-manager-bridge": "5.2.*",
         "symfony/security-bundle": "5.2.*",
         "symfony/serializer": "5.2.*",
-        "symfony/yaml": "5.2.*"
+        "symfony/yaml": "5.2.*",
+        "zircote/swagger-php": "^3.1"
     },
     "config": {
         "optimize-autoloader": true,

@@ -8,9 +8,19 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use OpenApi\Annotations as OA;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ *
+ * @OA\Schema()
+ *
+ * @OA\Schema(
+ *     schema="UserGetCollectionRecette",
+ *     @OA\Property(property="firstname", type="string"),
+ *     @OA\Property(property="lastname", type="string")
+ * )
+ *
  */
 class User implements UserInterface
 {
@@ -19,16 +29,21 @@ class User implements UserInterface
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups({"read:recette"})
+     *
+     * @OA\Property(type="integer")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     *
+     * @OA\Property(type="string", default="john@doe.fr")
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
+     * @OA\Property(type="array", @OA\Items(type="string"))
      */
     private $roles = [];
 
@@ -41,17 +56,23 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read:recette"})
+     *
+     * @OA\Property(type="string", default="John")
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read:recette"})
+     *
+     * @OA\Property(type="string", default="Doe")
      */
     private $lastname;
 
     /**
      * @ORM\OneToMany(targetEntity=Recette::class, mappedBy="user", orphanRemoval=true)
+     *
+     * @OA\Property(type="array", @OA\Items(ref="#/components/schemas/Recette"))
      */
     private $recettes;
 

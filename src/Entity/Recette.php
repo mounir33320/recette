@@ -7,8 +7,53 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use OpenApi\Annotations as OA;
 
 /**
+ * @OA\Schema()
+ * @OA\Parameter(
+ *          name="orderBy[nom]",
+ *          in="query",
+ *          description="Order by a nom",
+ *          @OA\Schema(type="array", @OA\Items(type="string", enum={"asc","desc"}))
+ * ),
+ * @OA\Parameter(
+ *          name="orderBy[cout]",
+ *          in="query",
+ *          description="Order by a cout",
+ *
+ *          @OA\Schema(type="array", @OA\Items(type="string",maxProperties=1, enum={"asc","desc"}))
+ * ),
+ * @OA\Parameter(
+ *          name="orderBy[nbPersonne]",
+ *          in="query",
+ *          description="Order by a nbPersonne",
+ *          @OA\Schema(type="array", @OA\Items(type="string", enum={"asc","desc"}))
+ * ),
+ * @OA\Parameter(
+ *          name="orderBy[dateCreation]",
+ *          in="query",
+ *          description="Order by a dateCreation",
+ *          @OA\Schema(type="array", @OA\Items(type="string", enum={"asc","desc"}))
+ * ),
+ * @OA\Parameter(
+ *          name="orderBy[tempsPreparation]",
+ *          in="query",
+ *          description="Order by a tempsPreparation",
+ *          @OA\Schema(type="array", @OA\Items(type="string", enum={"asc","desc"}))
+ * ),
+ * @OA\Parameter(
+ *          name="limit",
+ *          in="query",
+ *          description="Limit the number of resource",
+ *          @OA\Schema(type="integer")
+ * ),
+ * @OA\Parameter(
+ *          name="query",
+ *          in="query",
+ *          description="Search recettes with a query string",
+ *          @OA\Schema(type="string")
+ * ),
  * @ORM\Entity(repositoryClass=RecetteRepository::class)
  */
 class Recette
@@ -17,56 +62,73 @@ class Recette
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "post:recette"})
+     *
+     * @OA\Property(type="integer")
      */
     private $id;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "post:recette"})
+     *
+     * @OA\Property(type="integer", default="55")
      */
     private $tempsPreparation;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "post:recette"})
+     *
+     * @OA\Property(type="integer")
      */
     private $cout;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "post:recette"})
+     *
+     * @OA\Property(type="integer")
      */
     private $nbPersonne;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups({"read:recette"})
+     *
+     * @OA\Property(type="string", format="date-time")
      */
     private $dateCreation;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "post:recette"})
+     *
+     * @OA\Property(type="string")
      */
     private $nom;
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "post:recette"})
+     * @OA\Property(type="boolean")
      */
     private $public;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recettes")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "post:recette"})
+     *
+     * @OA\Property (type="object", ref="#/components/schemas/UserGetCollectionRecette")
      */
     private $user;
 
     /**
      * @ORM\ManyToMany(targetEntity=Categorie::class, mappedBy="recettes")
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "post:recette"})
+     *
+     * @OA\Property(type="array", @OA\Items(ref="#/components/schemas/Category"))
      */
     private $categories;
 

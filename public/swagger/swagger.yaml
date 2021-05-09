@@ -1,0 +1,434 @@
+openapi: 3.0.0
+info:
+  title: 'API Tutoriel'
+  version: '1'
+servers:
+  -
+    url: 'https://localhost:8000'
+    description: 'Mon API'
+paths:
+  /recettes:
+    get:
+      tags:
+        - Recette
+      description: 'Get a collection of Recette'
+      operationId: 'App\Controller\RecetteController::index'
+      parameters:
+        -
+          $ref: '#/components/parameters/orderBy[nom]'
+        -
+          $ref: '#/components/parameters/orderBy[cout]'
+        -
+          $ref: '#/components/parameters/orderBy[nbPersonne]'
+        -
+          $ref: '#/components/parameters/orderBy[dateCreation]'
+        -
+          $ref: '#/components/parameters/orderBy[tempsPreparation]'
+        -
+          $ref: '#/components/parameters/limit'
+        -
+          $ref: '#/components/parameters/query'
+      responses:
+        '200':
+          description: 'Get a collection of Recette'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recette'
+        '404':
+          $ref: '#/components/responses/notFound'
+    post:
+      tags:
+        - Recette
+      description: 'Create an item of Recette'
+      operationId: 'App\Controller\RecetteController::add'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - tempsPreparation
+                - cout
+                - nbpersonne
+                - nom
+                - public
+              properties:
+                tempsPreparation:
+                  type: integer
+                cout:
+                  type: integer
+                nbPersonne:
+                  type: integer
+                nom:
+                  type: string
+                public:
+                  type: boolean
+                categories:
+                  type: array
+                  items: { $ref: '#/components/schemas/CategoryPostRecette' }
+              type: object
+      responses:
+        '201':
+          description: 'Create an item of Recette'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recette'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '400':
+          $ref: '#/components/responses/badRequest'
+  '/recettes/{id}':
+    get:
+      tags:
+        - Recette
+      description: 'Get an item of Recette'
+      operationId: 'App\Controller\RecetteController::show'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID de la ressource'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Get an item of Recette'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recette'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+    put:
+      tags:
+        - Recette
+      description: 'Update an item of recette'
+      operationId: 'App\Controller\RecetteController::update'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - tempsPreparation
+                - cout
+                - nbpersonne
+                - nom
+                - public
+              properties:
+                tempsPreparation:
+                  type: integer
+                cout:
+                  type: integer
+                nbpersonne:
+                  type: integer
+                nom:
+                  type: string
+                public:
+                  type: boolean
+                categories:
+                  type: array
+                  items: { $ref: '#/components/schemas/CategoryPostRecette' }
+              type: object
+      responses:
+        '200':
+          description: 'Update an item of recette'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recette'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+    delete:
+      tags:
+        - Recette
+      description: 'Delete an item of Recette'
+      operationId: 'App\Controller\RecetteController::delete'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+      responses:
+        '204':
+          description: 'Success - Item is deleted'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: Success }
+                type: object
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+    patch:
+      tags:
+        - Recette
+      description: 'Update an item of recette'
+      operationId: 'App\Controller\RecetteController::partialUpdate'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                tempsPreparation:
+                  type: integer
+                cout:
+                  type: integer
+                nbpersonne:
+                  type: integer
+                nom:
+                  type: string
+                public:
+                  type: boolean
+                categories:
+                  type: array
+                  items: { $ref: '#/components/schemas/CategoryPostRecette' }
+              type: object
+      responses:
+        '200':
+          description: 'Update an item of recette'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recette'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+  /login:
+    post:
+      tags:
+        - Authentication
+      operationId: 'App\Controller\SecurityController::logIn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: john@doe.fr
+                password:
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: 'Login into the API'
+          content:
+            application/json:
+              schema:
+                properties:
+                  username: { type: string, example: john@doe.fr }
+                  roles: { type: array, items: { type: string, example: ROLE_USER } }
+                type: object
+  /logout:
+    get:
+      tags:
+        - Authentication
+      operationId: 'App\Controller\SecurityController::logout'
+      responses:
+        '200':
+          description: 'Disconnect from API'
+components:
+  schemas:
+    CategoryPostRecette:
+      properties:
+        id:
+          type: integer
+      type: object
+    Category:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        recettes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recette'
+      type: object
+    Recette:
+      properties:
+        id:
+          type: integer
+        tempsPreparation:
+          type: integer
+          default: '55'
+        cout:
+          type: integer
+        nbPersonne:
+          type: integer
+        dateCreation:
+          type: string
+          format: date-time
+        nom:
+          type: string
+        public:
+          type: boolean
+        user:
+          $ref: '#/components/schemas/UserGetCollectionRecette'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+      type: object
+    User:
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          default: john@doe.fr
+        roles:
+          type: array
+          items:
+            type: string
+        firstname:
+          type: string
+          default: John
+        lastname:
+          type: string
+          default: Doe
+        recettes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recette'
+      type: object
+    UserGetCollectionRecette:
+      properties:
+        firstname:
+          type: string
+        lastname:
+          type: string
+      type: object
+  responses:
+    notFound:
+      description: 'This resource not found'
+      content:
+        application/json:
+          schema:
+            properties:
+              message:
+                type: string
+                example: 'Cette ressource n''existe pas'
+            type: object
+    unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            properties:
+              message:
+                type: string
+                example: 'Vous devez être authentifié'
+            type: object
+    badRequest:
+      description: 'Bad request'
+      content:
+        application/json:
+          schema:
+            properties:
+              message:
+                type: string
+                example: 'bad request'
+            type: object
+  parameters:
+    'orderBy[nom]':
+      name: 'orderBy[nom]'
+      in: query
+      description: 'Order by a nom'
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - asc
+            - desc
+    'orderBy[cout]':
+      name: 'orderBy[cout]'
+      in: query
+      description: 'Order by a cout'
+      schema:
+        type: array
+        items:
+          maxProperties: 1
+          type: string
+          enum:
+            - asc
+            - desc
+    'orderBy[nbPersonne]':
+      name: 'orderBy[nbPersonne]'
+      in: query
+      description: 'Order by a nbPersonne'
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - asc
+            - desc
+    'orderBy[dateCreation]':
+      name: 'orderBy[dateCreation]'
+      in: query
+      description: 'Order by a dateCreation'
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - asc
+            - desc
+    'orderBy[tempsPreparation]':
+      name: 'orderBy[tempsPreparation]'
+      in: query
+      description: 'Order by a tempsPreparation'
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - asc
+            - desc
+    limit:
+      name: limit
+      in: query
+      description: 'Limit the number of resource'
+      schema:
+        type: integer
+    query:
+      name: query
+      in: query
+      description: 'Search recettes with a query string'
+      schema:
+        type: string
+  securitySchemes:
+    basic:
+      type: http
+      scheme: basic

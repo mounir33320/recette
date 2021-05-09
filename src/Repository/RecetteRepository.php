@@ -33,7 +33,9 @@ class RecetteRepository extends ServiceEntityRepository
     {
 
         $queryBuilder = $this->createQueryBuilder("r");
-        $queryBuilder->innerJoin("r.user", "u")
+        $queryBuilder
+                    /*->andWhere("r.public = true")
+                    ->orWhere("r.user = " .$user->getId() );*/
                     ->orWhere(
                         $queryBuilder->expr()->eq('r.public', true),
                         $user == null? null : $queryBuilder->expr()->eq('r.user', $user->getId())

@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use OpenApi\Annotations as OA;
 
 
 class RecetteController extends AbstractController
@@ -45,6 +46,28 @@ class RecetteController extends AbstractController
     }
 
     /**
+     * @OA\Get(
+     *     tags={"Recette"},
+     *     path="/recettes",
+     *     description="Get a collection of Recette",
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[nom]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[cout]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[nbPersonne]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[dateCreation]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[tempsPreparation]"),
+     *     @OA\Parameter(ref="#/components/parameters/limit"),
+     *     @OA\Parameter(ref="#/components/parameters/query"),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Get a collection of Recette",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Recette"))
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     * )
+     *
      * @Route("/recettes", name="recettes_list", methods={"GET"})
      * @param Request $request
      * @return Response
@@ -96,6 +119,31 @@ class RecetteController extends AbstractController
     }
 
     /**
+     *  @OA\Get(
+     *     tags={"Recette"},
+     *     path="/recettes/{id}",
+     *     description="Get an item of Recette",
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="ID de la ressource",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Get an item of Recette",
+     *          @OA\JsonContent(ref="#/components/schemas/Recette")
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     *     @OA\Response(
+     *          response="401",
+     *          ref="#/components/responses/unauthorized"
+     *     )
+     * )
      * @Route("/recettes/{id}", name="recettes_item", methods={"GET"})
      * @param Recette $recette
      * @return Response
@@ -114,6 +162,43 @@ class RecetteController extends AbstractController
     }
 
     /**
+     * @OA\Post(
+     *     tags={"Recette"},
+     *     path="/recettes",
+     *     description="Create an item of Recette",
+     *     @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"tempsPreparation", "cout", "nbpersonne", "nom", "public"},
+     *              @OA\Property(type="integer", property="tempsPreparation"),
+     *              @OA\Property(type="integer", property="cout"),
+     *              @OA\Property(type="integer", property="nbPersonne"),
+     *              @OA\Property(type="string", property="nom"),
+     *              @OA\Property(type="boolean", property="public"),
+     *              @OA\Property(type="array", property="categories", @OA\Items(ref="#/components/schemas/CategoryPostRecette")),
+     *          )
+     *     ),
+     *     @OA\Response(
+     *          response="201",
+     *          description="Create an item of Recette",
+     *          @OA\JsonContent(ref="#/components/schemas/Recette")
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     *     @OA\Response(
+     *          response="401",
+     *          ref="#/components/responses/unauthorized"
+     *     ),
+     *     @OA\Response(
+     *          response="400",
+     *          ref="#/components/responses/badRequest"
+     *     )
+     * )
+     *
+     *
+     *
      * @Route("/recettes", name="recettes_add", methods={"POST"})
      * @param Request $request
      * @return Response
@@ -123,7 +208,7 @@ class RecetteController extends AbstractController
     {
         $user = $this->getUser();
         $data = $request->getContent();
-        $dataDecode = $this->serializer()->decode($data,"json");
+        $dataDecode = $this->serializer()->decode($data,"json", ["groups" => ["post:recette"]]);
         $context = ["groups" => ["read:recette"]];
 
         $recette = new Recette();
@@ -162,6 +247,44 @@ class RecetteController extends AbstractController
     }
 
     /**
+     * @OA\Put(
+     *     tags={"Recette"},
+     *     path="/recettes/{id}",
+     *     description="Update an item of recette",
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true
+     *     ),
+     *     @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"tempsPreparation", "cout", "nbpersonne", "nom", "public"},
+     *              @OA\Property(type="integer", property="tempsPreparation"),
+     *              @OA\Property(type="integer", property="cout"),
+     *              @OA\Property(type="integer", property="nbpersonne"),
+     *              @OA\Property(type="string", property="nom"),
+     *              @OA\Property(type="boolean", property="public"),
+     *              @OA\Property(type="array", property="categories", @OA\Items(ref="#/components/schemas/CategoryPostRecette")),
+     *          )
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Update an item of recette",
+     *          @OA\JsonContent(ref="#/components/schemas/Recette")
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     *     @OA\Response(
+     *          response="401",
+     *          ref="#/components/responses/unauthorized"
+     *     )
+     * )
+     *
+     *
+     *
      * @Route("/recettes/{id}", name="recettes_update", methods={"PUT"})
      * @param Recette $recette
      * @param Request $request
@@ -218,6 +341,43 @@ class RecetteController extends AbstractController
     }
 
     /**
+     * @OA\Patch (
+     *     tags={"Recette"},
+     *     description="Update an item of recette",
+     *     path="/recettes/{id}",
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true
+     *     ),
+     *     @OA\RequestBody(
+     *          @OA\JsonContent(
+     *              @OA\Property(type="integer", property="tempsPreparation"),
+     *              @OA\Property(type="integer", property="cout"),
+     *              @OA\Property(type="integer", property="nbpersonne"),
+     *              @OA\Property(type="string", property="nom"),
+     *              @OA\Property(type="boolean", property="public"),
+     *              @OA\Property(type="array", property="categories", @OA\Items(ref="#/components/schemas/CategoryPostRecette")),
+     *          )
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Update an item of recette",
+     *          @OA\JsonContent(ref="#/components/schemas/Recette")
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     *     @OA\Response(
+     *          response="401",
+     *          ref="#/components/responses/unauthorized"
+     *     )
+     * )
+     *
+     *
+     *
+     *
      * @Route("/recettes/{id}", name="recettes_partial_update", methods={"PATCH"})
      * @param Recette $recette
      * @param Request $request
@@ -284,6 +444,35 @@ class RecetteController extends AbstractController
     }
 
     /**
+     * @OA\Delete(
+     *     tags={"Recette"},
+     *     path="/recettes/{id}",
+     *     description="Delete an item of Recette",
+     *     @OA\Parameter(
+     *          name="id",
+     *          required=true,
+     *          in="path"
+     *     ),
+     *     @OA\Response(
+     *          response="204",
+     *          description="Success - Item is deleted",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Success")
+     *          )
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     *     @OA\Response(
+     *          response="401",
+     *          ref="#/components/responses/unauthorized"
+     *     )
+     *
+     * )
+     *
+     *
+     *
      * @Route("/recettes/{id}", name="recettes_delete", methods={"DELETE"})
      * @param Recette $recette
      * @return JsonResponse
