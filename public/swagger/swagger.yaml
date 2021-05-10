@@ -225,6 +225,46 @@ paths:
           $ref: '#/components/responses/notFound'
         '401':
           $ref: '#/components/responses/unauthorized'
+  '/users/{id}/recettes':
+    get:
+      tags:
+        - Recette
+      summary: 'Collection of Recette by user'
+      description: 'Get a collection of Recette by user'
+      operationId: 'App\Controller\RecetteController::userRecettes'
+      parameters:
+        -
+          $ref: '#/components/parameters/orderBy[nom]'
+        -
+          $ref: '#/components/parameters/orderBy[cout]'
+        -
+          $ref: '#/components/parameters/orderBy[nbPersonne]'
+        -
+          $ref: '#/components/parameters/orderBy[dateCreation]'
+        -
+          $ref: '#/components/parameters/orderBy[tempsPreparation]'
+        -
+          $ref: '#/components/parameters/limit'
+        -
+          $ref: '#/components/parameters/query'
+        -
+          name: id
+          in: path
+          description: 'ID de l''utilisateur'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Get a collection of Recette by user'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recette'
+        '404':
+          $ref: '#/components/responses/notFound'
   /login:
     post:
       tags:

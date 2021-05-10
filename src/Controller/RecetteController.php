@@ -9,6 +9,7 @@ use App\Entity\Recette;
 use App\Entity\User;
 use App\Repository\CategorieRepository;
 use App\Repository\RecetteRepository;
+use App\Service\RecetteFilters;
 use App\Traits\SerializerTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -72,45 +73,22 @@ class RecetteController extends AbstractController
      *
      * @Route("/recettes", name="recettes_list", methods={"GET"})
      * @param Request $request
+     * @param RecetteFilters $recetteFilters
      * @return Response
      */
-    public function index(Request $request) : Response
+    public function index(Request $request, RecetteFilters $recetteFilters) : Response
     {
         $currentUser= $this->getUser();
 
-//        if($user != $recette->getUser()){
-//            throw new UnauthorizedHttpException(null);
-//        }
-
         $context = ["groups" => ["read:recette"]];
         $paramsURL = $request->query->all();
-        $page = (isset($paramsURL["page"]) && $paramsURL["page"] >=0) ? (int)$paramsURL["page"] : 1;
-        $limit = (isset($paramsURL["limit"]) && $paramsURL["limit"] >=0) ? (int)$paramsURL["limit"] : 3;
-        $query = isset($paramsURL["query"]) ? strtolower($paramsURL["query"]) : null;
-        $orderBy = [];
 
         $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
 
-        if ($query != null)
-        {
-            $query = explode(" ", $query);
-        }
-
-        // On vérifie que les clés et les valeurs des paramètres orderBy sont valides
-        if(isset($paramsURL["orderBy"]))
-        {
-            foreach ($paramsURL["orderBy"] as $key => $value)
-            {
-                if(in_array($key, $keyFilters) && in_array(strtoupper($value), ["ASC","DESC"]))
-                {
-                    $orderBy[$key] = $value;
-                }
-            }
-        }
-
-        if (empty($orderBy)) {
-            $orderBy = ["nom" => "asc"];
-        }
+        $orderBy = $recetteFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
+        $page = $recetteFilters->getPage($paramsURL);
+        $limit = $recetteFilters->getLimit($paramsURL);
+        $query = $recetteFilters->getQuery($paramsURL);
 
         $recettesList = $this->recetteRepository->findAllRecettesPaginated($query,$orderBy,$page,$limit,$currentUser);
 
@@ -120,7 +98,6 @@ class RecetteController extends AbstractController
         $response->headers->set("Content-type","application/json");
 
         return $response;
-
     }
 
     /**
@@ -156,7 +133,6 @@ class RecetteController extends AbstractController
      */
     public function show(Recette $recette) : Response
     {
-
             $context = ["groups" => ["read:recette"]];
             $recetteSerialized = $this->serializer()->serialize($recette, "json", $context);
 
@@ -164,7 +140,6 @@ class RecetteController extends AbstractController
             $response->headers->set("Content-type","application/json");
 
             return $response;
-
     }
 
     /**
@@ -226,7 +201,6 @@ class RecetteController extends AbstractController
                 ->setCout($dataDecode["cout"])
                 ->setUser($user);
 
-
         foreach ($dataDecode["categories"] as $value){
             //methode 1
             //$categories = $this->categorieRepository->find($value);
@@ -240,8 +214,6 @@ class RecetteController extends AbstractController
                 $recette->addCategory($checkCategorieInDb);
             }
         }
-
-        //dd($recette);
 
         $this->entityManager->persist($recette);
         $this->entityManager->flush();
@@ -340,7 +312,6 @@ class RecetteController extends AbstractController
             }
         }
 
-
         $this->entityManager->flush();
 
         $recetteNormalized = $this->serializer()->normalize($recette, "json", $context);
@@ -408,7 +379,6 @@ class RecetteController extends AbstractController
 
         foreach ($dataDeserialized as $key => $value)
         {
-
             $methodeSet = "set".ucfirst($key);
 
             if(method_exists($recette, $methodeSet))
@@ -442,7 +412,7 @@ class RecetteController extends AbstractController
 //            }
             else
             {
-                return new JsonResponse(["error" => "Cette propriété n'existe pas"],Response::HTTP_NOT_FOUND);
+                return new JsonResponse(["error" => "Cette propriété n'existe pas"],Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -489,51 +459,62 @@ class RecetteController extends AbstractController
      */
     public function delete(Recette $recette) : JsonResponse
     {
-
         $this->entityManager->remove($recette);
         $this->entityManager->flush();
-        return new JsonResponse(["message"=>"Success"],Response::HTTP_NO_CONTENT);
 
+        return new JsonResponse(["message"=>"Success"],Response::HTTP_NO_CONTENT);
     }
 
     /**
+     * @OA\Get(
+     *     tags={"Recette"},
+     *     path="/users/{id}/recettes",
+     *     summary="Collection of Recette by user",
+     *     description="Get a collection of Recette by user",
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[nom]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[cout]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[nbPersonne]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[dateCreation]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[tempsPreparation]"),
+     *     @OA\Parameter(ref="#/components/parameters/limit"),
+     *     @OA\Parameter(ref="#/components/parameters/query"),
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="ID de l'utilisateur",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Get a collection of Recette by user",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Recette"))
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     * )
+     *
+     *
+     *
      * @Route("/users/{id}/recettes", name="user_recettes", methods={"GET"})
      * @param User $user
      * @param Request $request
+     * @param RecetteFilters $recetteFilters
      * @return JsonResponse
      * @throws ExceptionInterface
      */
-    public function userRecettes(User $user,Request $request) : JsonResponse
+    public function userRecettes(User $user,Request $request, RecetteFilters $recetteFilters) : JsonResponse
     {
         $currentUser = $this->getUser();
         $paramsURL = $request->query->all();
-        $page = (isset($paramsURL["page"]) && $paramsURL["page"] >=0) ? (int)$paramsURL["page"] : 1;
-        $limit = (isset($paramsURL["limit"]) && $paramsURL["limit"] >=0) ? (int)$paramsURL["limit"] : 3;
-        $query = isset($paramsURL["query"]) ? strtolower($paramsURL["query"]) : null;
-        $orderBy = [];
-
         $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
 
-        if ($query != null)
-        {
-            $query = explode(" ", $query);
-        }
-
-        // On vérifie que les clés et les valeurs des paramètres orderBy sont valides
-        if(isset($paramsURL["orderBy"]))
-        {
-            foreach ($paramsURL["orderBy"] as $key => $value)
-            {
-                if(in_array($key, $keyFilters) && in_array(strtoupper($value), ["ASC","DESC"]))
-                {
-                    $orderBy[$key] = $value;
-                }
-            }
-        }
-
-        if (empty($orderBy)) {
-            $orderBy = ["nom" => "asc"];
-        }
+        $orderBy = $recetteFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
+        $page = $recetteFilters->getPage($paramsURL);
+        $limit = $recetteFilters->getLimit($paramsURL,5);
+        $query = $recetteFilters->getQuery($paramsURL);
 
         $recettesList = $this->recetteRepository->findRecettesByUser($query,$orderBy,$page,$limit,$user,$currentUser);
 

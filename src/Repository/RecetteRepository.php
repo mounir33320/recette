@@ -29,7 +29,7 @@ class RecetteRepository extends ServiceEntityRepository
                 ;
     }
 
-    public function filter($query = null,$orderBy = null,$page = 1,$limit = 3)
+    private function filter($query = null,$orderBy = null,$page = 1,$limit = 3)
     {
         $queryBuilder = $this->createQueryBuilder("r");
 
