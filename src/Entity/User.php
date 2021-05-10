@@ -76,6 +76,11 @@ class User implements UserInterface
      */
     private $recettes;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $actif;
+
     public function __construct()
     {
         $this->recettes = new ArrayCollection();
@@ -212,6 +217,23 @@ class User implements UserInterface
                 $recette->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getActif(): ?bool
+    {
+        return $this->actif;
+    }
+
+    public function setActif(bool $actif): self
+    {
+        if (in_array(["ROLE_ADMIN"],$this->getRoles())) {
+            $this->actif = true;
+            return $this;
+        }
+
+        $this->actif = $actif;
 
         return $this;
     }

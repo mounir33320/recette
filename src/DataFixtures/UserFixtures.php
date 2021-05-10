@@ -32,24 +32,31 @@ class UserFixtures extends Fixture
 //       $manager->persist($user);
 //       $manager->flush();
 
-        $user2 = new User();
-        $user2->setEmail("tata@tata.fr")
-            ->setFirstname("Tata")
-            ->setLastname("TATA")
-            ->setRoles(["ROLE_USER"])
-            ->setPassword($this->userPasswordEncoder->encodePassword($user2, "tata"));
+//        $user2 = new User();
+//        $user2->setEmail("tata@tata.fr")
+//            ->setFirstname("Tata")
+//            ->setLastname("TATA")
+//            ->setRoles(["ROLE_USER"])
+//            ->setPassword($this->userPasswordEncoder->encodePassword($user2, "tata"));
+//
+//        $manager->persist($user2);
+//        $manager->flush();
+//
+//        $user3 = new User();
+//        $user3->setEmail("titi@titi.fr")
+//            ->setFirstname("Titi")
+//            ->setLastname("TITI")
+//            ->setRoles(["ROLE_USER"])
+//            ->setPassword($this->userPasswordEncoder->encodePassword($user3, "titi"));
 
-        $manager->persist($user2);
-        $manager->flush();
+        $userAdmin = new User();
+        $userAdmin->setEmail("tutu@tutu.fr")
+            ->setFirstname("Tutu")
+            ->setLastname("TUTU")
+            ->setRoles(["ROLE_ADMIN"])
+            ->setPassword($this->userPasswordEncoder->encodePassword($userAdmin, "tutu"));
 
-        $user3 = new User();
-        $user3->setEmail("titi@titi.fr")
-            ->setFirstname("Titi")
-            ->setLastname("TITI")
-            ->setRoles(["ROLE_USER"])
-            ->setPassword($this->userPasswordEncoder->encodePassword($user3, "titi"));
-
-        $manager->persist($user3);
+        $manager->persist($userAdmin);
         $manager->flush();
     }
 }
