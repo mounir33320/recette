@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Categorie;
 use App\Entity\Recette;
+use App\Entity\User;
 use App\Repository\CategorieRepository;
 use App\Repository\RecetteRepository;
 use App\Traits\SerializerTrait;
@@ -85,12 +86,15 @@ class RecetteController extends AbstractController
         $paramsURL = $request->query->all();
         $page = (isset($paramsURL["page"]) && $paramsURL["page"] >=0) ? (int)$paramsURL["page"] : 1;
         $limit = (isset($paramsURL["limit"]) && $paramsURL["limit"] >=0) ? (int)$paramsURL["limit"] : 3;
-        $query = isset($paramsURL["query"]) && $paramsURL["query"] != "" ? $paramsURL["query"] : null;
+        $query = isset($paramsURL["query"]) ? strtolower($paramsURL["query"]) : null;
         $orderBy = [];
 
-        $criteria = [];
-
         $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
+
+        if ($query != null)
+        {
+            $query = explode(" ", $query);
+        }
 
         // On vérifie que les clés et les valeurs des paramètres orderBy sont valides
         if(isset($paramsURL["orderBy"]))
@@ -490,5 +494,51 @@ class RecetteController extends AbstractController
         $this->entityManager->flush();
         return new JsonResponse(["message"=>"Success"],Response::HTTP_NO_CONTENT);
 
+    }
+
+    /**
+     * @Route("/users/{id}/recettes", name="user_recettes", methods={"GET"})
+     * @param User $user
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ExceptionInterface
+     */
+    public function userRecettes(User $user,Request $request) : JsonResponse
+    {
+        $currentUser = $this->getUser();
+        $paramsURL = $request->query->all();
+        $page = (isset($paramsURL["page"]) && $paramsURL["page"] >=0) ? (int)$paramsURL["page"] : 1;
+        $limit = (isset($paramsURL["limit"]) && $paramsURL["limit"] >=0) ? (int)$paramsURL["limit"] : 3;
+        $query = isset($paramsURL["query"]) ? strtolower($paramsURL["query"]) : null;
+        $orderBy = [];
+
+        $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
+
+        if ($query != null)
+        {
+            $query = explode(" ", $query);
+        }
+
+        // On vérifie que les clés et les valeurs des paramètres orderBy sont valides
+        if(isset($paramsURL["orderBy"]))
+        {
+            foreach ($paramsURL["orderBy"] as $key => $value)
+            {
+                if(in_array($key, $keyFilters) && in_array(strtoupper($value), ["ASC","DESC"]))
+                {
+                    $orderBy[$key] = $value;
+                }
+            }
+        }
+
+        if (empty($orderBy)) {
+            $orderBy = ["nom" => "asc"];
+        }
+
+        $recettesList = $this->recetteRepository->findRecettesByUser($query,$orderBy,$page,$limit,$user,$currentUser);
+
+        $recettesEncoded = $this->serializer()->normalize($recettesList,"json",["groups" => ["read:recette"]]);
+
+        return new JsonResponse($recettesEncoded,Response::HTTP_OK);
     }
 }

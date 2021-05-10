@@ -29,40 +29,60 @@ class RecetteRepository extends ServiceEntityRepository
                 ;
     }
 
-    public function findAllRecettesPaginated($criteria,$orderBy,$page,$limit,$user)
+    public function filter($query = null,$orderBy = null,$page = 1,$limit = 3)
     {
-
         $queryBuilder = $this->createQueryBuilder("r");
-        $queryBuilder
-                    /*->andWhere("r.public = true")
-                    ->orWhere("r.user = " .$user->getId() );*/
-                    ->orWhere(
-                        $queryBuilder->expr()->eq('r.public', true),
-                        $user == null? null : $queryBuilder->expr()->eq('r.user', $user->getId())
-                    );
 
-        if($criteria != null){
-            $queryBuilder->andWhere("r.nom LIKE :nom")
-                ->setParameter("nom", "%$criteria%");
+        if($query != null){
+            $k = 0;
+            foreach ($query as $queryWord) {
+                $k++;
+                $queryBuilder->andWhere("r.nom LIKE :nom$k")
+                    ->setParameter("nom$k", "%$queryWord%");
+            }
         }
-//        foreach ($criteria as $key => $value) {
-//            $queryBuilder->andWhere("r.{$key} = '{$value}'");
-//        }
 
         foreach ($orderBy as $key => $value) {
             $queryBuilder->addOrderBy("r.{$key}",$value);
         }
 
-        $query = $queryBuilder->getQuery()
+        return $queryBuilder
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
         ;
-
-        return $query->getResult();
-        //return new Paginator($query);
     }
 
+    public function findAllRecettesPaginated($query,$orderBy,$page,$limit,$currentUser)
+    {
+        $queryBuilder = $this->filter($query,$orderBy,$page,$limit);
 
+        $queryBuilder
+            /*->andWhere("r.public = true")
+            ->orWhere("r.user = " .$user->getId() );*/
+            ->orWhere(
+                $queryBuilder->expr()->eq('r.public', true),
+                $currentUser == null? null : $queryBuilder->expr()->eq('r.user', $currentUser->getId())
+            );
+
+        $sqlQuery = $queryBuilder->getQuery();
+
+        return $sqlQuery->getResult();
+        //return new Paginator($sqlQuery);
+    }
+
+    public function findRecettesByUser($query,$orderBy,$page,$limit,$user,$currentUser)
+    {
+        $queryBuilder = $this->filter($query,$orderBy,$page,$limit)
+            ->andWhere("r.user = " . $user->getId());
+
+        if ($user != $currentUser) {
+            $queryBuilder->andWhere("r.public = true");
+        }
+
+        $sqlQuery = $queryBuilder->getQuery();
+
+        return $sqlQuery->getResult();
+    }
 
     // /**
     //  * @return Recette[] Returns an array of Recette objects
