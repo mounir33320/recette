@@ -9,6 +9,16 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
+ * @OA\Schema(
+ *     schema="CategoriePostRecette",
+ *     @OA\Property(property="id", type="integer")
+ * )
+ * @OA\Schema(
+ *     @OA\Property(property="id", type="integer"),
+ *     @OA\Property(property="nom", type="string"),
+ *     @OA\Property(property="recettes", type="array", @OA\Items(ref="#/components/schemas/Recette"))
+ * )
+ *
  * @ORM\Entity(repositoryClass=CategorieRepository::class)
  */
 class Categorie

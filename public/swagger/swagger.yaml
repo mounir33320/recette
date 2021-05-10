@@ -71,7 +71,7 @@ paths:
                   type: boolean
                 categories:
                   type: array
-                  items: { $ref: '#/components/schemas/CategoryPostRecette' }
+                  items: { $ref: '#/components/schemas/CategoriePostRecette' }
               type: object
       responses:
         '201':
@@ -147,7 +147,7 @@ paths:
                   type: boolean
                 categories:
                   type: array
-                  items: { $ref: '#/components/schemas/CategoryPostRecette' }
+                  items: { $ref: '#/components/schemas/CategoriePostRecette' }
               type: object
       responses:
         '200':
@@ -212,7 +212,7 @@ paths:
                   type: boolean
                 categories:
                   type: array
-                  items: { $ref: '#/components/schemas/CategoryPostRecette' }
+                  items: { $ref: '#/components/schemas/CategoriePostRecette' }
               type: object
       responses:
         '200':
@@ -266,16 +266,16 @@ paths:
           description: 'Disconnect from API'
 components:
   schemas:
-    CategoryPostRecette:
+    CategoriePostRecette:
       properties:
         id:
           type: integer
       type: object
-    Category:
+    Categorie:
       properties:
         id:
           type: integer
-        name:
+        nom:
           type: string
         recettes:
           type: array
@@ -305,7 +305,7 @@ components:
         categories:
           type: array
           items:
-            $ref: '#/components/schemas/Category'
+            $ref: '#/components/schemas/Categorie'
       type: object
     User:
       properties:

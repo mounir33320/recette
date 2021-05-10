@@ -178,7 +178,7 @@ class RecetteController extends AbstractController
      *              @OA\Property(type="integer", property="nbPersonne"),
      *              @OA\Property(type="string", property="nom"),
      *              @OA\Property(type="boolean", property="public"),
-     *              @OA\Property(type="array", property="categories", @OA\Items(ref="#/components/schemas/CategoryPostRecette")),
+     *              @OA\Property(type="array", property="categories", @OA\Items(ref="#/components/schemas/CategoriePostRecette")),
      *          )
      *     ),
      *     @OA\Response(
@@ -269,7 +269,7 @@ class RecetteController extends AbstractController
      *              @OA\Property(type="integer", property="nbpersonne"),
      *              @OA\Property(type="string", property="nom"),
      *              @OA\Property(type="boolean", property="public"),
-     *              @OA\Property(type="array", property="categories", @OA\Items(ref="#/components/schemas/CategoryPostRecette")),
+     *              @OA\Property(type="array", property="categories", @OA\Items(ref="#/components/schemas/CategoriePostRecette")),
      *          )
      *     ),
      *     @OA\Response(
@@ -362,7 +362,7 @@ class RecetteController extends AbstractController
      *              @OA\Property(type="integer", property="nbpersonne"),
      *              @OA\Property(type="string", property="nom"),
      *              @OA\Property(type="boolean", property="public"),
-     *              @OA\Property(type="array", property="categories", @OA\Items(ref="#/components/schemas/CategoryPostRecette")),
+     *              @OA\Property(type="array", property="categories", @OA\Items(ref="#/components/schemas/CategoriePostRecette")),
      *          )
      *     ),
      *     @OA\Response(

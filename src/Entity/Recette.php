@@ -128,7 +128,7 @@ class Recette
      * @ORM\ManyToMany(targetEntity=Categorie::class, mappedBy="recettes")
      * @Groups({"read:recette", "post:recette"})
      *
-     * @OA\Property(type="array", @OA\Items(ref="#/components/schemas/Category"))
+     * @OA\Property(type="array", @OA\Items(ref="#/components/schemas/Categorie"))
      */
     private $categories;
 
