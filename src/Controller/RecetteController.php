@@ -11,6 +11,7 @@ use App\Repository\CategorieRepository;
 use App\Repository\RecetteRepository;
 use App\Service\RecetteFilters;
 use App\Traits\SerializerTrait;
+use App\Traits\ValidatorErrorTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,6 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 class RecetteController extends AbstractController
@@ -34,17 +36,24 @@ class RecetteController extends AbstractController
      */
     private $entityManager;
     private $categorieRepository;
+    /**
+     * @var ValidatorInterface
+     */
+    private $validator;
 
     use SerializerTrait;
+    use ValidatorErrorTrait;
 
 
     public function __construct(RecetteRepository $recetteRepository,
                                 EntityManagerInterface $entityManager,
-                                CategorieRepository $categorieRepository)
+                                CategorieRepository $categorieRepository,
+                                ValidatorInterface $validator)
     {
         $this->recetteRepository = $recetteRepository;
         $this->entityManager = $entityManager;
         $this->categorieRepository = $categorieRepository;
+        $this->validator = $validator;
     }
 
     /**
@@ -89,6 +98,7 @@ class RecetteController extends AbstractController
         $page = $recetteFilters->getPage($paramsURL);
         $limit = $recetteFilters->getLimit($paramsURL);
         $query = $recetteFilters->getQuery($paramsURL);
+
 
         $recettesList = $this->recetteRepository->findAllRecettesPaginated($query,$orderBy,$page,$limit,$currentUser);
 
@@ -194,12 +204,17 @@ class RecetteController extends AbstractController
         $context = ["groups" => ["read:recette"]];
 
         $recette = new Recette();
-        $recette->setNom($dataDecode["nom"])
+        $recette->setNom("")
                 ->setNbPersonne($dataDecode["nbPersonne"])
                 ->setTempsPreparation($dataDecode["tempsPreparation"])
                 ->setPublic($dataDecode["public"])
                 ->setCout($dataDecode["cout"])
                 ->setUser($user);
+
+        $responseError = $this->validate($this->validator, $recette);
+        if($responseError != null){
+            return $responseError;
+        }
 
         foreach ($dataDecode["categories"] as $value){
             //methode 1
@@ -312,6 +327,11 @@ class RecetteController extends AbstractController
             }
         }
 
+        $responseError = $this->validate($this->validator, $recette);
+        if($responseError != null){
+            return $responseError;
+        }
+
         $this->entityManager->flush();
 
         $recetteNormalized = $this->serializer()->normalize($recette, "json", $context);
@@ -414,6 +434,11 @@ class RecetteController extends AbstractController
             {
                 return new JsonResponse(["error" => "Cette propriété n'existe pas"],Response::HTTP_BAD_REQUEST);
             }
+        }
+
+        $responseError = $this->validate($this->validator, $recette);
+        if($responseError != null){
+            return $responseError;
         }
 
         $this->entityManager->flush();

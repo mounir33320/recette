@@ -6,8 +6,10 @@ use App\Repository\RecetteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @OA\Schema()
@@ -55,9 +57,14 @@ use OpenApi\Annotations as OA;
  *          @OA\Schema(type="string")
  * ),
  * @ORM\Entity(repositoryClass=RecetteRepository::class)
+ *
+ * @UniqueEntity("nom")
  */
+
+
 class Recette
 {
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -87,7 +94,7 @@ class Recette
     /**
      * @ORM\Column(type="integer")
      * @Groups({"read:recette", "post:recette"})
-     *
+     * @Assert\Range(min="10")
      * @OA\Property(type="integer")
      */
     private $nbPersonne;
@@ -103,7 +110,7 @@ class Recette
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read:recette", "post:recette"})
-     *
+     * @Assert\NotBlank(message="Ce champ ne peut pas être vide.")
      * @OA\Property(type="string")
      */
     private $nom;
@@ -123,9 +130,6 @@ class Recette
      * @OA\Property (type="object", ref="#/components/schemas/UserGetCollectionRecette")
      */
     private $user;
-
-
-
 
     /**
      * @ORM\ManyToMany(targetEntity=Categorie::class, mappedBy="recettes")
