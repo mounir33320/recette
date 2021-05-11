@@ -77,9 +77,9 @@ class User implements UserInterface
     private $recettes;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", options = {"default" = true})
      */
-    private $actif;
+    private $actif=true;
 
     public function __construct()
     {

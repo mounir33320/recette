@@ -55,6 +55,7 @@ class UserFixtures extends Fixture
             ->setLastname("TUTU")
             ->setRoles(["ROLE_ADMIN"])
             ->setPassword($this->userPasswordEncoder->encodePassword($userAdmin, "tutu"));
+            //->setActif(true);
 
         $manager->persist($userAdmin);
         $manager->flush();
