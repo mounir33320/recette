@@ -29,5 +29,12 @@ class ExceptionListener
             $jsonResponse = new JsonResponse(["message" => "Vous n'être pas autorisé à réaliser cette action."]);
             $exceptionEvent->setResponse($jsonResponse);
         }
+
+        if($throwable->getCode() == -1)
+        {
+            $jsonResponse = new JsonResponse(["message" => "Une erreur est survenue au niveau du serveur."]);
+            $exceptionEvent->setResponse($jsonResponse);
+        }
+
     }
 }

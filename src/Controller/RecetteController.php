@@ -87,6 +87,7 @@ class RecetteController extends AbstractController
      */
     public function index(Request $request, RecetteFilters $recetteFilters) : Response
     {
+
         $currentUser= $this->getUser();
 
         $context = ["groups" => ["read:recette"]];
@@ -204,7 +205,7 @@ class RecetteController extends AbstractController
         $context = ["groups" => ["read:recette"]];
 
         $recette = new Recette();
-        $recette->setNom("")
+        $recette->setNom($dataDecode["nom"])
                 ->setNbPersonne($dataDecode["nbPersonne"])
                 ->setTempsPreparation($dataDecode["tempsPreparation"])
                 ->setPublic($dataDecode["public"])
