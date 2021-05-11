@@ -39,4 +39,20 @@ class UserController extends AbstractController
 
       return new JsonResponse($message,Response::HTTP_OK);
     }
+
+    /**
+     * @Route("/users/activate/{id}", name="activate_user", methods={"GET"})
+     * @param User $user
+     * @return JsonResponse
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function activate(User $user): JsonResponse
+    {
+        $user->setActif(true);
+        $this->entityManager->flush();
+
+        $message = ["message"=>"L'utilisateur {$user->getFirstname()} {$user->getLastname()} à l'id {$user->getId()} à bien été activé."];
+
+        return new JsonResponse($message,Response::HTTP_OK);
+    }
 }

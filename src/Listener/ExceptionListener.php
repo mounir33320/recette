@@ -19,7 +19,12 @@ class ExceptionListener
         }
         else if(method_exists($throwable,"getStatusCode") && $throwable->getStatusCode() == 401)
         {
-            $jsonResponse = new JsonResponse(["message" => "Vous devez être authentifié"]);
+            $jsonResponse = new JsonResponse(["message" => "Vous devez être authentifié."]);
+            $exceptionEvent->setResponse($jsonResponse);
+        }
+        else if(method_exists($throwable,"getStatusCode") && $throwable->getStatusCode() == 403)
+        {
+            $jsonResponse = new JsonResponse(["message" => "Vous n'être pas autorisé à réaliser cette action."]);
             $exceptionEvent->setResponse($jsonResponse);
         }
     }
