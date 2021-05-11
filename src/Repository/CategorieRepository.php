@@ -19,6 +19,31 @@ class CategorieRepository extends ServiceEntityRepository
         parent::__construct($registry, Categorie::class);
     }
 
+//    private function filter($query = null,$orderBy = null,$page = 1,$limit = 3)
+//    {
+//        $queryBuilder = $this->createQueryBuilder("c");
+//
+//        if($query != null){
+//            $k = 0;
+//            foreach ($query as $queryWord) {
+//                $k++;
+//                $queryBuilder->andWhere("c.nom LIKE :nom$k")
+//                    ->setParameter("nom$k", "%$queryWord%");
+//            }
+//        }
+//
+//        foreach ($orderBy as $key => $value) {
+//            $queryBuilder->addOrderBy("c.{$key}",$value);
+//        }
+//
+//        return $queryBuilder
+//            ->setFirstResult(($page - 1) * $limit)
+//            ->setMaxResults($limit)
+//            ;
+//    }
+
+
+
     // /**
     //  * @return Categorie[] Returns an array of Categorie objects
     //  */

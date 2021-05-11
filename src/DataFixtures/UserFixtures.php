@@ -49,15 +49,15 @@ class UserFixtures extends Fixture
 //            ->setRoles(["ROLE_USER"])
 //            ->setPassword($this->userPasswordEncoder->encodePassword($user3, "titi"));
 
-        $userAdmin = new User();
-        $userAdmin->setEmail("tutu@tutu.fr")
-            ->setFirstname("Tutu")
-            ->setLastname("TUTU")
-            ->setRoles(["ROLE_ADMIN"])
-            ->setPassword($this->userPasswordEncoder->encodePassword($userAdmin, "tutu"));
-            //->setActif(true);
-
-        $manager->persist($userAdmin);
-        $manager->flush();
+//        $userAdmin = new User();
+//        $userAdmin->setEmail("tutu@tutu.fr")
+//            ->setFirstname("Tutu")
+//            ->setLastname("TUTU")
+//            ->setRoles(["ROLE_ADMIN"])
+//            ->setPassword($this->userPasswordEncoder->encodePassword($userAdmin, "tutu"));
+//            //->setActif(true);
+//
+//        $manager->persist($userAdmin);
+//        $manager->flush();
     }
 }

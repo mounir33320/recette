@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use OpenApi\Annotations as OA;
 
+
 /**
  * @OA\Schema(
  *     schema="CategoriePostRecette",

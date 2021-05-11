@@ -19,13 +19,17 @@ class RecetteFilters
         // On vérifie que les clés et les valeurs des paramètres orderBy sont valides
         if(isset($params["orderBy"]))
         {
+
             foreach ($params["orderBy"] as $key => $value)
             {
                 if(in_array($key, $keyFilters) && in_array(strtoupper($value), ["ASC","DESC"]))
                 {
                     $orderBy[$key] = $value;
+
+
                 }
             }
+
         }
 
         if (empty($orderBy)) {
