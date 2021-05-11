@@ -124,6 +124,9 @@ class Recette
      */
     private $user;
 
+
+
+
     /**
      * @ORM\ManyToMany(targetEntity=Categorie::class, mappedBy="recettes")
      * @Groups({"read:recette", "post:recette"})

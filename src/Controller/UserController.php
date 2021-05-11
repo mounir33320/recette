@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use OpenApi\Annotations as OA;
+
 
 class UserController extends AbstractController
 {
@@ -25,6 +27,34 @@ class UserController extends AbstractController
 
     // php 8 #[Route('/user', name: 'user')]
     /**
+     * @OA\Get(
+     *     tags={"User"},
+     *     path="/users/deactivate/{id}",
+     *     summary="Deactivate a User",
+     *     description="Deactivate a User",
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="id de l'utilisateur",
+     *          required=true
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Deactivate a User",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message",type="string",example="L'utilisateur a bien été désactivé.")
+     *          )
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     *     @OA\Response(
+     *          response="403",
+     *          ref="#/components/responses/forbidden"
+     *     ),
+     * )
+     *
      * @Route("/users/deactivate/{id}", name="deactivate_user", methods={"GET"})
      * @param User $user
      * @return JsonResponse

@@ -304,6 +304,32 @@ paths:
       responses:
         '200':
           description: 'Disconnect from API'
+  '/users/deactivate/{id}':
+    get:
+      tags:
+        - User
+      summary: 'Deactivate a User'
+      description: 'Deactivate a User'
+      operationId: 'App\Controller\UserController::deactivate'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'id de l''utilisateur'
+          required: true
+      responses:
+        '200':
+          description: 'Deactivate a User'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'L''utilisateur a bien été désactivé.' }
+                type: object
+        '404':
+          $ref: '#/components/responses/notFound'
+        '403':
+          $ref: '#/components/responses/forbidden'
 components:
   schemas:
     CategoriePostRecette:
@@ -396,6 +422,16 @@ components:
               message:
                 type: string
                 example: 'Vous devez être authentifié'
+            type: object
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            properties:
+              message:
+                type: string
+                example: 'Vous n''êtes pas autorisé à effectuer cette action.'
             type: object
     badRequest:
       description: 'Bad request'

@@ -26,6 +26,14 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Response(
+ *     response="forbidden",
+ *     description="Forbidden",
+ *     @OA\JsonContent(
+ *          @OA\Property(property="message", type="string", example="Vous n'êtes pas autorisé à effectuer cette action.")
+ *     )
+ * )
+ *
+ * @OA\Response(
  *     response="badRequest",
  *     description="Bad request",
  *     @OA\JsonContent(
