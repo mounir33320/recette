@@ -548,4 +548,59 @@ class RecetteController extends AbstractController
 
         return new JsonResponse($recettesEncoded,Response::HTTP_OK);
     }
+
+     /**
+     * @OA\Get(
+     *     tags={"Recette"},
+     *     path="/categories/{id}/recettes",
+     *     summary="Collection of Recette by Categorie",
+     *     description="Get a collection of Recette by Categorie",
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[nom]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[cout]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[nbPersonne]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[dateCreation]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[tempsPreparation]"),
+     *     @OA\Parameter(ref="#/components/parameters/limit"),
+     *     @OA\Parameter(ref="#/components/parameters/query"),
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="ID de la Categorie",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Get a collection of Recette by Categorie",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Recette"))
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     * )
+     *
+    * @Route("/categories/{id}/recettes", name="categorie_recettes", methods={"GET"})
+    * @param Request $request
+    * @param RecetteFilters $recetteFilters
+    * @return JsonResponse
+        * @throws ExceptionInterface
+    */
+    public function categorieRecettes(Categorie $categorie,Request $request, RecetteFilters $recetteFilters) : JsonResponse
+    {
+
+        $paramsURL = $request->query->all();
+        $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
+
+        $orderBy = $recetteFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
+        $page = $recetteFilters->getPage($paramsURL);
+        $limit = $recetteFilters->getLimit($paramsURL,5);
+        $query = $recetteFilters->getQuery($paramsURL);
+
+        $recettesList = $this->recetteRepository->findRecettesByCategorie($query,$orderBy,$page,$limit,$categorie);
+
+        $recettesEncoded = $this->serializer()->normalize($recettesList,"json",["groups" => ["read:recette"]]);
+
+        return new JsonResponse($recettesEncoded,Response::HTTP_OK);
+    }
 }

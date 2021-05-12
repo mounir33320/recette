@@ -71,6 +71,33 @@ class UserController extends AbstractController
     }
 
     /**
+     * @OA\Get(
+     *     tags={"User"},
+     *     path="/users/activate/{id}",
+     *     summary="Activate a User",
+     *     description="Activate a User",
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="id de l'utilisateur",
+     *          required=true
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Activate a User",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message",type="string",example="L'utilisateur a bien été activé.")
+     *          )
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     *     @OA\Response(
+     *          response="403",
+     *          ref="#/components/responses/forbidden"
+     *     ),
+     * )
      * @Route("/users/activate/{id}", name="activate_user", methods={"GET"})
      * @param User $user
      * @return JsonResponse

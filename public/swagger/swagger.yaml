@@ -36,9 +36,40 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Categorie'
+                  $ref: '#/components/schemas/CategorieReadRecette'
         '404':
           $ref: '#/components/responses/notFound'
+    post:
+      tags:
+        - Categorie
+      summary: 'Add an item Categorie'
+      description: 'Create an item of Categorie'
+      operationId: 'App\Controller\CategorieController::add'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                nom:
+                  type: string
+                recette:
+                  type: array
+                  items: { $ref: '#/components/schemas/Recette' }
+              type: object
+      responses:
+        '201':
+          description: 'Create an item of Categorie'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '400':
+          $ref: '#/components/responses/badRequest'
   '/categories/{id}':
     get:
       tags:
@@ -61,6 +92,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Categorie'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+    put:
+      tags:
+        - Categorie
+      summary: 'Update an item Categorie'
+      description: 'Update an item of Categorie'
+      operationId: 'App\Controller\CategorieController::update'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                nom:
+                  type: string
+                recettes:
+                  type: array
+                  items: { $ref: '#/components/schemas/Recette' }
+              type: object
+      responses:
+        '200':
+          description: 'Update an item of categorie'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+    delete:
+      tags:
+        - Categorie
+      summary: 'Delete an item Categorie'
+      description: 'Delete an item of Categorie'
+      operationId: 'App\Controller\CategorieController::delete'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+      responses:
+        '204':
+          description: 'Success - Item is deleted'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: Success }
+                type: object
         '404':
           $ref: '#/components/responses/notFound'
         '401':
@@ -322,6 +411,46 @@ paths:
                   $ref: '#/components/schemas/Recette'
         '404':
           $ref: '#/components/responses/notFound'
+  '/categories/{id}/recettes':
+    get:
+      tags:
+        - Recette
+      summary: 'Collection of Recette by Categorie'
+      description: 'Get a collection of Recette by Categorie'
+      operationId: 'App\Controller\RecetteController::categorieRecettes'
+      parameters:
+        -
+          $ref: '#/components/parameters/orderBy[nom]'
+        -
+          $ref: '#/components/parameters/orderBy[cout]'
+        -
+          $ref: '#/components/parameters/orderBy[nbPersonne]'
+        -
+          $ref: '#/components/parameters/orderBy[dateCreation]'
+        -
+          $ref: '#/components/parameters/orderBy[tempsPreparation]'
+        -
+          $ref: '#/components/parameters/limit'
+        -
+          $ref: '#/components/parameters/query'
+        -
+          name: id
+          in: path
+          description: 'ID de la Categorie'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Get a collection of Recette by Categorie'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recette'
+        '404':
+          $ref: '#/components/responses/notFound'
   /login:
     post:
       tags:
@@ -365,8 +494,8 @@ paths:
     get:
       tags:
         - User
-      summary: 'Deactivate a User'
-      description: 'Deactivate a User'
+      summary: 'Deactivate an User'
+      description: 'Deactivate an User'
       operationId: 'App\Controller\UserController::deactivate'
       parameters:
         -
@@ -382,6 +511,32 @@ paths:
               schema:
                 properties:
                   message: { type: string, example: 'L''utilisateur a bien été désactivé.' }
+                type: object
+        '404':
+          $ref: '#/components/responses/notFound'
+        '403':
+          $ref: '#/components/responses/forbidden'
+  '/users/activate/{id}':
+    get:
+      tags:
+        - User
+      summary: 'Activate an User'
+      description: 'Activate an User'
+      operationId: 'App\Controller\UserController::activate'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'id de l''utilisateur'
+          required: true
+      responses:
+        '200':
+          description: 'Activate a User'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'L''utilisateur a bien été activé.' }
                 type: object
         '404':
           $ref: '#/components/responses/notFound'
@@ -429,6 +584,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Categorie'
+      type: object
+    CategorieReadRecette:
+      properties:
+        nbPersonne:
+          type: integer
+        cout:
+          type: integer
+        tempsPreparation:
+          type: integer
+        id:
+          type: integer
+        nom:
+          type: string
+        dateCreation:
+          type: string
+          format: date-time
+        public:
+          type: boolean
+        user:
+          $ref: '#/components/schemas/UserGetCollectionRecette'
       type: object
     User:
       properties:

@@ -59,10 +59,13 @@ class RecetteRepository extends ServiceEntityRepository
         $queryBuilder
             /*->andWhere("r.public = true")
             ->orWhere("r.user = " .$user->getId() );*/
+
+            ->innerJoin("r.user", "u")
             ->orWhere(
                 $queryBuilder->expr()->eq('r.public', true),
-                $currentUser == null? null : $queryBuilder->expr()->eq('r.user', $currentUser->getId())
-            );
+                $currentUser == null? null : $queryBuilder->expr()->eq('r.user', $currentUser->getId()))
+            ->andWhere("u.actif = true");
+            //->andWhere(":user MEMBER OF r.user")->setParameter("user", $currentUser);
 
         $sqlQuery = $queryBuilder->getQuery();
 
@@ -73,11 +76,26 @@ class RecetteRepository extends ServiceEntityRepository
     public function findRecettesByUser($query,$orderBy,$page,$limit,$user,$currentUser)
     {
         $queryBuilder = $this->filter($query,$orderBy,$page,$limit)
-            ->andWhere("r.user = " . $user->getId());
+            //->andWhere("r.user = " . $user->getId());
+            ->andWhere(":user MEMBER OF r.user")
+            ->setParameter("user", $user);
 
         if ($user != $currentUser) {
             $queryBuilder->andWhere("r.public = true");
         }
+
+        $sqlQuery = $queryBuilder->getQuery();
+
+        return $sqlQuery->getResult();
+    }
+
+    public function findRecettesByCategorie($query,$orderBy,$page,$limit,$categorie)
+    {
+        $queryBuilder = $this->filter($query,$orderBy,$page,$limit);
+
+        $queryBuilder->andWhere(":categorie MEMBER OF r.categories")
+                    ->setParameter("categorie", $categorie);
+
 
         $sqlQuery = $queryBuilder->getQuery();
 

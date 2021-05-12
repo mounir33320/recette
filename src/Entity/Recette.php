@@ -15,6 +15,17 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  *
  * @OA\Schema()
+ * @OA\Schema(
+ *     schema="CategorieReadRecette",
+ *     @OA\Property(property="nbPersonne",type="integer"),
+ *     @OA\Property(property="cout",type="integer"),
+ *     @OA\Property(property="tempsPreparation",type="integer"),
+ *     @OA\Property(property="id",type="integer"),
+ *     @OA\Property(property="nom",type="string"),
+ *     @OA\Property(property="dateCreation",type="string",format="date-time"),
+ *     @OA\Property(property="public",type="boolean"),
+ *     @OA\Property(property="user",type="object",ref="#/components/schemas/UserGetCollectionRecette")
+ * )
  * @OA\Parameter(
  *          name="orderBy[nom]",
  *          in="query",
