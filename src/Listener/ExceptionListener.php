@@ -16,25 +16,33 @@ class ExceptionListener
         {
             $jsonResponse = new JsonResponse(["message" => "Cette ressource n'existe pas."]);
             $exceptionEvent->setResponse($jsonResponse);
+            return;
         }
 
         if(method_exists($throwable,"getStatusCode") && $throwable->getStatusCode() == 401)
         {
             $jsonResponse = new JsonResponse(["message" => "Vous devez être authentifié."]);
             $exceptionEvent->setResponse($jsonResponse);
+            return;
         }
 
         if(method_exists($throwable,"getStatusCode") && $throwable->getStatusCode() == 403)
         {
-            $jsonResponse = new JsonResponse(["message" => "Vous n'être pas autorisé à réaliser cette action."]);
+            $jsonResponse = new JsonResponse(["message" => "Vous n'êtes pas autorisé à réaliser cette action."]);
             $exceptionEvent->setResponse($jsonResponse);
+            return;
         }
 
-        if($throwable->getCode() == -1)
+        if(method_exists($throwable,"getStatusCode") && $throwable->getStatusCode() == 405)
         {
-            $jsonResponse = new JsonResponse(["message" => "Une erreur est survenue au niveau du serveur."]);
+            $jsonResponse = new JsonResponse(["message" => "Cette méthode HTTP n'est pas autorisée."]);
             $exceptionEvent->setResponse($jsonResponse);
+            return;
         }
+
+        /*$jsonResponse = new JsonResponse(["message" => "Une erreur est survenue au niveau du serveur."]);
+        $exceptionEvent->setResponse($jsonResponse);*/
+
 
     }
 }

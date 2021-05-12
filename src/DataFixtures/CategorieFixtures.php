@@ -30,13 +30,13 @@ class CategorieFixtures extends Fixture
 //        $manager->persist($categorie);
 //        $manager->flush();
 
-        for($i=0; $i<=30; $i++){
+        /*for($i=0; $i<=30; $i++){
 
             $categorie = new Categorie();
             $categorie->setNom("Catégorie {$i}");
 
             $manager->persist($categorie);
         }
-        $manager->flush();
+        $manager->flush();*/
     }
 }

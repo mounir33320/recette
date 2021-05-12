@@ -29,18 +29,19 @@ class Categorie
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "read:categorie"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette", "read:categorie"})
      */
     private $nom;
 
     /**
      * @ORM\ManyToMany(targetEntity=Recette::class, inversedBy="categories")
+     * @Groups({"read:categorie"})
      */
     private $recettes;
 

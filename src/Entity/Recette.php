@@ -12,6 +12,8 @@ use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ *
+ *
  * @OA\Schema()
  * @OA\Parameter(
  *          name="orderBy[nom]",
@@ -69,7 +71,7 @@ class Recette
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette", "post:recette"})
+     * @Groups({"read:recette", "post:recette", "read:categorie"})
      *
      * @OA\Property(type="integer")
      */
@@ -77,7 +79,7 @@ class Recette
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette", "post:recette"})
+     * @Groups({"read:recette", "post:recette","read:categorie"})
      *
      * @OA\Property(type="integer", default="55")
      */
@@ -85,7 +87,7 @@ class Recette
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette", "post:recette"})
+     * @Groups({"read:recette", "post:recette","read:categorie"})
      *
      * @OA\Property(type="integer")
      */
@@ -93,7 +95,7 @@ class Recette
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette", "post:recette"})
+     * @Groups({"read:recette", "post:recette","read:categorie"})
      * @Assert\Range(min="10")
      * @OA\Property(type="integer")
      */
@@ -101,7 +103,7 @@ class Recette
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"read:recette"})
+     * @Groups({"read:recette","read:categorie"})
      *
      * @OA\Property(type="string", format="date-time")
      */
@@ -109,7 +111,7 @@ class Recette
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:recette", "post:recette"})
+     * @Groups({"read:recette", "post:recette","read:categorie"})
      * @Assert\NotBlank(message="Ce champ ne peut pas être vide.")
      * @OA\Property(type="string")
      */
@@ -117,7 +119,7 @@ class Recette
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"read:recette", "post:recette"})
+     * @Groups({"read:recette", "post:recette","read:categorie"})
      * @OA\Property(type="boolean")
      */
     private $public;
@@ -125,7 +127,7 @@ class Recette
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recettes")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"read:recette", "post:recette"})
+     * @Groups({"read:recette", "post:recette","read:categorie"})
      *
      * @OA\Property (type="object", ref="#/components/schemas/UserGetCollectionRecette")
      */

@@ -8,6 +8,63 @@ servers:
     url: 'http://localhost:8000'
     description: 'Mon API'
 paths:
+  /categories:
+    get:
+      tags:
+        - Categorie
+      summary: 'Collection of Categorie'
+      description: 'Get a collection of Categorie'
+      operationId: 'App\Controller\CategorieController::index'
+      parameters:
+        -
+          name: 'orderBy[nom]'
+          in: query
+          description: 'Order by nom'
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - asc
+                - desc
+      responses:
+        '200':
+          description: 'Get a collection of Categorie'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categorie'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/categories/{id}':
+    get:
+      tags:
+        - Categorie
+      summary: 'Item of Categorie'
+      description: 'Get an item of Categorie'
+      operationId: 'App\Controller\CategorieController::show'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID de la ressource'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Get an item of Categorie'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
   /recettes:
     get:
       tags:
