@@ -3,15 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\Categorie;
+use App\Entity\Recette;
 use App\Repository\CategorieRepository;
 use App\Service\RecetteFilters;
 use App\Traits\SerializerTrait;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 class CategorieController extends AbstractController
 {
@@ -20,12 +24,17 @@ class CategorieController extends AbstractController
      * @var CategorieRepository
      */
     private $categorieRepository;
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
 
     use SerializerTrait;
 
-    public function __construct(CategorieRepository $categorieRepository)
+    public function __construct(CategorieRepository $categorieRepository, EntityManagerInterface $entityManager)
     {
         $this->categorieRepository = $categorieRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -112,5 +121,69 @@ class CategorieController extends AbstractController
 
 
         return new JsonResponse($categorieSerialized, Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/categories", name="categorie_add", methods={"POST"})
+     * @param Request $request
+     * @return Response
+     * @IsGranted("ROLE_ADMIN")
+     */
+
+    public function add(Request $request):Response
+    {
+        //$context = ["groups" => ["read:categorie"]];
+        //$recette = $this->getDoctrine()->getRepository(Recette::class)->find(2);
+        $data = $request->getContent();
+        $dataDecode = $this->serializer()->decode($data,"json");
+
+        $categorie = new Categorie();
+        $categorie->setNom($dataDecode["nom"]);
+                    //->addRecette($recette);
+
+        $this->entityManager->persist($categorie);
+        $this->entityManager->flush();
+
+        $dataJson = $this->serializer()->serialize(["data" => $categorie, "message" => "Success"], "json");
+        $response = new Response($dataJson,Response::HTTP_CREATED);
+        $response->headers->set("Content-type","application/json");
+
+        return $response;
+    }
+
+    /**
+     * @Route("/categories/{id}", name="categorie_update", methods={"PUT"})
+     * @param Categorie $categorie
+     * @param Request $request
+     * @return JsonResponse
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function update(Categorie $categorie, Request $request) :JsonResponse
+    {
+        $data = $request->getContent();
+        $dataDeserialized = $this->serializer()->decode($data, "json");
+
+        $categorie->setNom($dataDeserialized["nom"]);
+
+        $this->entityManager->flush();
+
+        $categorieNormalized = $this->serializer()->normalize($categorie, "json");
+
+        return new JsonResponse(["data"=>$categorieNormalized,"message"=>"Success"],Response::HTTP_OK);
+    }
+
+     /**
+     * @Route("/categories/{id}", name="delete_categorie", methods={"DELETE"})
+     * @param Categorie $categorie
+     * @return JsonResponse
+     * @IsGranted("ROLE_ADMIN")
+     */
+
+    public function delete(Categorie $categorie){
+
+        $this->entityManager->remove($categorie);
+        $this->entityManager->flush();
+
+        return new JsonResponse(["message"=>"Success"],Response::HTTP_NO_CONTENT);
     }
 }
