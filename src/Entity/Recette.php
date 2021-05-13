@@ -158,6 +158,18 @@ class Recette
      */
     private $ingredients;
 
+    /**
+     * @ORM\Column(type="string", length=1000)
+     * @Groups({"read:recette"})
+     */
+    private $steps;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"read:recette"})
+     */
+    private $note;
+
     public function __construct()
     {
         $this->dateCreation = new \DateTime('now');
@@ -304,6 +316,30 @@ class Recette
         if ($this->ingredients->removeElement($ingredient)) {
             $ingredient->removeRecette($this);
         }
+
+        return $this;
+    }
+
+    public function getSteps(): ?string
+    {
+        return $this->steps;
+    }
+
+    public function setSteps(string $steps): self
+    {
+        $this->steps = $steps;
+
+        return $this;
+    }
+
+    public function getNote(): ?int
+    {
+        return $this->note;
+    }
+
+    public function setNote(?int $note): self
+    {
+        $this->note = $note;
 
         return $this;
     }

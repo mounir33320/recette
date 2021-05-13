@@ -31,13 +31,13 @@ class IngredientFixtures extends Fixture
 //        $manager->persist($categorie);
 //        $manager->flush();
 
-        for($i=0; $i<=30; $i++){
-
-            $ingredient = new Ingredient();
-            $ingredient->setNom("Ingredient {$i}");
-
-            $manager->persist($ingredient);
-        }
-        $manager->flush();
+//        for($i=0; $i<=30; $i++){
+//
+//            $ingredient = new Ingredient();
+//            $ingredient->setNom("Ingredient {$i}");
+//
+//            $manager->persist($ingredient);
+//        }
+//        $manager->flush();
     }
 }
