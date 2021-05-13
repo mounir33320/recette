@@ -19,12 +19,13 @@ class Ingredient
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"read:recette"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:ingredient"})
+     * @Groups({"read:ingredient","read:recette"})
      */
     private $nom;
 

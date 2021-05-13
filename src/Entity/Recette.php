@@ -154,6 +154,7 @@ class Recette
 
     /**
      * @ORM\ManyToMany(targetEntity=Ingredient::class, mappedBy="recettes")
+     * @Groups({"read:recette"})
      */
     private $ingredients;
 

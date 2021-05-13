@@ -102,6 +102,19 @@ class RecetteRepository extends ServiceEntityRepository
         return $sqlQuery->getResult();
     }
 
+    public function findRecettesByIngredient($query,$orderBy,$page,$limit,$ingredient)
+    {
+        $queryBuilder = $this->filter($query,$orderBy,$page,$limit);
+
+        $queryBuilder->andWhere(":ingredients MEMBER OF r.ingredients")
+            ->setParameter("ingredients", $ingredient);
+
+
+        $sqlQuery = $queryBuilder->getQuery();
+
+        return $sqlQuery->getResult();
+    }
+
     // /**
     //  * @return Recette[] Returns an array of Recette objects
     //  */

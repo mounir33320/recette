@@ -5,6 +5,7 @@ namespace App\Controller;
 
 
 use App\Entity\Categorie;
+use App\Entity\Ingredient;
 use App\Entity\Recette;
 use App\Entity\User;
 use App\Repository\CategorieRepository;
@@ -549,43 +550,44 @@ class RecetteController extends AbstractController
         return new JsonResponse($recettesEncoded,Response::HTTP_OK);
     }
 
-     /**
-     * @OA\Get(
-     *     tags={"Recette"},
-     *     path="/categories/{id}/recettes",
-     *     summary="Collection of Recette by Categorie",
-     *     description="Get a collection of Recette by Categorie",
-     *     @OA\Parameter(ref="#/components/parameters/orderBy[nom]"),
-     *     @OA\Parameter(ref="#/components/parameters/orderBy[cout]"),
-     *     @OA\Parameter(ref="#/components/parameters/orderBy[nbPersonne]"),
-     *     @OA\Parameter(ref="#/components/parameters/orderBy[dateCreation]"),
-     *     @OA\Parameter(ref="#/components/parameters/orderBy[tempsPreparation]"),
-     *     @OA\Parameter(ref="#/components/parameters/limit"),
-     *     @OA\Parameter(ref="#/components/parameters/query"),
-     *     @OA\Parameter(
-     *          name="id",
-     *          in="path",
-     *          description="ID de la Categorie",
-     *          required=true,
-     *          @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *          response="200",
-     *          description="Get a collection of Recette by Categorie",
-     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Recette"))
-     *     ),
-     *     @OA\Response(
-     *          response="404",
-     *          ref="#/components/responses/notFound"
-     *     ),
-     * )
-     *
+    /**
+    * @OA\Get(
+    *     tags={"Recette"},
+    *     path="/categories/{id}/recettes",
+    *     summary="Collection of Recette by Categorie",
+    *     description="Get a collection of Recette by Categorie",
+    *     @OA\Parameter(ref="#/components/parameters/orderBy[nom]"),
+    *     @OA\Parameter(ref="#/components/parameters/orderBy[cout]"),
+    *     @OA\Parameter(ref="#/components/parameters/orderBy[nbPersonne]"),
+    *     @OA\Parameter(ref="#/components/parameters/orderBy[dateCreation]"),
+    *     @OA\Parameter(ref="#/components/parameters/orderBy[tempsPreparation]"),
+    *     @OA\Parameter(ref="#/components/parameters/limit"),
+    *     @OA\Parameter(ref="#/components/parameters/query"),
+    *     @OA\Parameter(
+    *          name="id",
+    *          in="path",
+    *          description="ID de la Categorie",
+    *          required=true,
+    *          @OA\Schema(type="integer")
+    *     ),
+    *     @OA\Response(
+    *          response="200",
+    *          description="Get a collection of Recette by Categorie",
+    *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Recette"))
+    *     ),
+    *     @OA\Response(
+    *          response="404",
+    *          ref="#/components/responses/notFound"
+    *     ),
+    * )
+    *
     * @Route("/categories/{id}/recettes", name="categorie_recettes", methods={"GET"})
     * @param Request $request
     * @param ParamsFilters $paramsFilters
     * @return JsonResponse
-        * @throws ExceptionInterface
+    * @throws ExceptionInterface
     */
+
     public function categorieRecettes(Categorie $categorie, Request $request, ParamsFilters $paramsFilters) : JsonResponse
     {
 
@@ -598,6 +600,63 @@ class RecetteController extends AbstractController
         $query = $paramsFilters->getQuery($paramsURL);
 
         $recettesList = $this->recetteRepository->findRecettesByCategorie($query,$orderBy,$page,$limit,$categorie);
+
+        $recettesEncoded = $this->serializer()->normalize($recettesList,"json",["groups" => ["read:recette"]]);
+
+        return new JsonResponse($recettesEncoded,Response::HTTP_OK);
+    }
+
+    /**
+     * @OA\Get(
+     *     tags={"Recette"},
+     *     path="/ingredients/{id}/recettes",
+     *     summary="Collection of Recette by Ingredient",
+     *     description="Get a collection of Recette by Ingredient",
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[nom]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[cout]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[nbPersonne]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[dateCreation]"),
+     *     @OA\Parameter(ref="#/components/parameters/orderBy[tempsPreparation]"),
+     *     @OA\Parameter(ref="#/components/parameters/limit"),
+     *     @OA\Parameter(ref="#/components/parameters/query"),
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="ID de l'Ingredient",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Get a collection of Recette by Ingredient",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Recette"))
+     *     ),
+     *     @OA\Response(
+     *          response="404",
+     *          ref="#/components/responses/notFound"
+     *     ),
+     * )
+     *
+     * @Route("/ingredients/{id}/recettes", name="ingredients", methods={"GET"})
+     * @param Ingredient $ingredient
+     * @param Request $request
+     * @param ParamsFilters $paramsFilters
+     * @return JsonResponse
+     * @throws ExceptionInterface
+     */
+
+    public function ingredientsRecettes(Ingredient $ingredient, Request $request, ParamsFilters $paramsFilters) : JsonResponse
+    {
+
+        $paramsURL = $request->query->all();
+        $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
+
+        $orderBy = $paramsFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
+        $page = $paramsFilters->getPage($paramsURL);
+        $limit = $paramsFilters->getLimit($paramsURL,5);
+        $query = $paramsFilters->getQuery($paramsURL);
+
+        $recettesList = $this->recetteRepository->findRecettesByIngredient($query,$orderBy,$page,$limit,$ingredient);
 
         $recettesEncoded = $this->serializer()->normalize($recettesList,"json",["groups" => ["read:recette"]]);
 

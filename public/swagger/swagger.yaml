@@ -554,6 +554,46 @@ paths:
                   $ref: '#/components/schemas/Recette'
         '404':
           $ref: '#/components/responses/notFound'
+  '/ingredients/{id}/recettes':
+    get:
+      tags:
+        - Recette
+      summary: 'Collection of Recette by Ingredient'
+      description: 'Get a collection of Recette by Ingredient'
+      operationId: 'App\Controller\RecetteController::ingredientsRecettes'
+      parameters:
+        -
+          $ref: '#/components/parameters/orderBy[nom]'
+        -
+          $ref: '#/components/parameters/orderBy[cout]'
+        -
+          $ref: '#/components/parameters/orderBy[nbPersonne]'
+        -
+          $ref: '#/components/parameters/orderBy[dateCreation]'
+        -
+          $ref: '#/components/parameters/orderBy[tempsPreparation]'
+        -
+          $ref: '#/components/parameters/limit'
+        -
+          $ref: '#/components/parameters/query'
+        -
+          name: id
+          in: path
+          description: 'ID de l''Ingredient'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Get a collection of Recette by Ingredient'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recette'
+        '404':
+          $ref: '#/components/responses/notFound'
   /login:
     post:
       tags:
