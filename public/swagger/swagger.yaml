@@ -157,7 +157,7 @@ paths:
   /ingredients:
     get:
       tags:
-        - Ingredients
+        - Ingredient
       summary: 'Collection of Ingredients'
       description: 'Get a collection of Ingredients'
       operationId: 'App\Controller\IngredientController::index'
@@ -179,6 +179,84 @@ paths:
                   $ref: '#/components/schemas/Recette'
         '404':
           $ref: '#/components/responses/notFound'
+    post:
+      tags:
+        - Ingredient
+      summary: 'Add an item Ingredient'
+      description: 'Create an item of Ingredient'
+      operationId: 'App\Controller\IngredientController::add'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                nom:
+                  type: string
+                recette:
+                  type: array
+                  items: { $ref: '#/components/schemas/Ingredient' }
+              type: object
+      responses:
+        '201':
+          description: 'Create an item of Ingredient'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '400':
+          $ref: '#/components/responses/badRequest'
+  '/ingredients/{id}':
+    put:
+      tags:
+        - Ingredient
+      summary: 'Update an Ingredient'
+      description: 'Update an Ingredient'
+      operationId: 'App\Controller\IngredientController::update'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: 'Update an item of Ingredient'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+    delete:
+      tags:
+        - Ingredient
+      summary: 'Delete an Ingredient'
+      description: 'Delete an Ingredient'
+      operationId: 'App\Controller\IngredientController::delete'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+      responses:
+        '204':
+          description: 'Success - Ingredient is deleted'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: Success }
+                type: object
+        '404':
+          $ref: '#/components/responses/notFound'
+        '401':
+          $ref: '#/components/responses/unauthorized'
   /recettes:
     get:
       tags:
@@ -585,6 +663,7 @@ components:
           items:
             $ref: '#/components/schemas/Recette'
       type: object
+    Ingredient: {  }
     Recette:
       properties:
         id:
