@@ -33,25 +33,25 @@ class RecetteFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        $categories = $this->categorieRepository->findAll();
-        $recettes = $this->recetteRepository->findAll();
-        $k = 0;
-        $i = 1;
-        $j = 2;
-
-        foreach($recettes as $recette){
-            if($i <= 23){
-                $recette->addCategory($categories[$i])
-                    ->addCategory($categories[$i])
-                    ->addCategory($categories[$j]);
-                $k++;
-                $i++;
-                $j++;
-                $manager->persist($recette);
-                $manager->flush();
-            }
-
-        }
+//        $categories = $this->categorieRepository->findAll();
+//        $recettes = $this->recetteRepository->findAll();
+//        $k = 0;
+//        $i = 1;
+//        $j = 2;
+//
+//        foreach($recettes as $recette){
+//            if($i <= 23){
+//                $recette->addCategory($categories[$i])
+//                    ->addCategory($categories[$i])
+//                    ->addCategory($categories[$j]);
+//                $k++;
+//                $i++;
+//                $j++;
+//                $manager->persist($recette);
+//                $manager->flush();
+//            }
+//
+//        }
 
 
 

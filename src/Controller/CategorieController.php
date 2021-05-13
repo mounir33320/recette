@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Categorie;
 use App\Entity\Recette;
 use App\Repository\CategorieRepository;
-use App\Service\RecetteFilters;
+use App\Service\ParamsFilters;
 use App\Traits\SerializerTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -68,12 +68,12 @@ class CategorieController extends AbstractController
      * @Route("/categories", name="categories_list", methods={"GET"})
      * @return JsonResponse
      */
-    public function index(Request $request, RecetteFilters $recetteFilters): JsonResponse
+    public function index(Request $request, ParamsFilters $paramsFilters): JsonResponse
     {
         $context = ["groups" => ["read:categorie"]];
         $paramsURL = $request->query->all();
         $keyFilters = ["nom", "id"];
-        $orderBy = $recetteFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
+        $orderBy = $paramsFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
 
         $categories = $this->categorieRepository->findBy($criteria = [], $orderBy);
 

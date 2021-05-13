@@ -9,7 +9,7 @@ use App\Entity\Recette;
 use App\Entity\User;
 use App\Repository\CategorieRepository;
 use App\Repository\RecetteRepository;
-use App\Service\RecetteFilters;
+use App\Service\ParamsFilters;
 use App\Traits\SerializerTrait;
 use App\Traits\ValidatorErrorTrait;
 use Doctrine\ORM\EntityManagerInterface;
@@ -82,10 +82,10 @@ class RecetteController extends AbstractController
      *
      * @Route("/recettes", name="recettes_list", methods={"GET"})
      * @param Request $request
-     * @param RecetteFilters $recetteFilters
+     * @param ParamsFilters $paramsFilters
      * @return Response
      */
-    public function index(Request $request, RecetteFilters $recetteFilters) : Response
+    public function index(Request $request, ParamsFilters $paramsFilters) : Response
     {
 
         $currentUser= $this->getUser();
@@ -95,10 +95,10 @@ class RecetteController extends AbstractController
 
         $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
 
-        $orderBy = $recetteFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
-        $page = $recetteFilters->getPage($paramsURL);
-        $limit = $recetteFilters->getLimit($paramsURL);
-        $query = $recetteFilters->getQuery($paramsURL);
+        $orderBy = $paramsFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
+        $page = $paramsFilters->getPage($paramsURL);
+        $limit = $paramsFilters->getLimit($paramsURL);
+        $query = $paramsFilters->getQuery($paramsURL);
 
 
         $recettesList = $this->recetteRepository->findAllRecettesPaginated($query,$orderBy,$page,$limit,$currentUser);
@@ -527,20 +527,20 @@ class RecetteController extends AbstractController
      * @Route("/users/{id}/recettes", name="user_recettes", methods={"GET"})
      * @param User $user
      * @param Request $request
-     * @param RecetteFilters $recetteFilters
+     * @param ParamsFilters $paramsFilters
      * @return JsonResponse
      * @throws ExceptionInterface
      */
-    public function userRecettes(User $user,Request $request, RecetteFilters $recetteFilters) : JsonResponse
+    public function userRecettes(User $user, Request $request, ParamsFilters $paramsFilters) : JsonResponse
     {
         $currentUser = $this->getUser();
         $paramsURL = $request->query->all();
         $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
 
-        $orderBy = $recetteFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
-        $page = $recetteFilters->getPage($paramsURL);
-        $limit = $recetteFilters->getLimit($paramsURL,5);
-        $query = $recetteFilters->getQuery($paramsURL);
+        $orderBy = $paramsFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
+        $page = $paramsFilters->getPage($paramsURL);
+        $limit = $paramsFilters->getLimit($paramsURL,5);
+        $query = $paramsFilters->getQuery($paramsURL);
 
         $recettesList = $this->recetteRepository->findRecettesByUser($query,$orderBy,$page,$limit,$user,$currentUser);
 
@@ -582,20 +582,20 @@ class RecetteController extends AbstractController
      *
     * @Route("/categories/{id}/recettes", name="categorie_recettes", methods={"GET"})
     * @param Request $request
-    * @param RecetteFilters $recetteFilters
+    * @param ParamsFilters $paramsFilters
     * @return JsonResponse
         * @throws ExceptionInterface
     */
-    public function categorieRecettes(Categorie $categorie,Request $request, RecetteFilters $recetteFilters) : JsonResponse
+    public function categorieRecettes(Categorie $categorie, Request $request, ParamsFilters $paramsFilters) : JsonResponse
     {
 
         $paramsURL = $request->query->all();
         $keyFilters = ["nom", "cout", "nbPersonne", "dateCreation", "tempsPreparation"];
 
-        $orderBy = $recetteFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
-        $page = $recetteFilters->getPage($paramsURL);
-        $limit = $recetteFilters->getLimit($paramsURL,5);
-        $query = $recetteFilters->getQuery($paramsURL);
+        $orderBy = $paramsFilters->getOrderBy($paramsURL,$keyFilters,["nom" => "asc"]);
+        $page = $paramsFilters->getPage($paramsURL);
+        $limit = $paramsFilters->getLimit($paramsURL,5);
+        $query = $paramsFilters->getQuery($paramsURL);
 
         $recettesList = $this->recetteRepository->findRecettesByCategorie($query,$orderBy,$page,$limit,$categorie);
 

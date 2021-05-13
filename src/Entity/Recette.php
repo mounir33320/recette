@@ -82,7 +82,7 @@ class Recette
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette", "post:recette", "read:categorie"})
+     * @Groups({"read:recette", "post:recette", "read:categorie","read:ingredient"})
      *
      * @OA\Property(type="integer")
      */
@@ -90,7 +90,7 @@ class Recette
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette", "post:recette","read:categorie"})
+     * @Groups({"read:recette", "post:recette","read:categorie","read:ingredient"})
      *
      * @OA\Property(type="integer", default="55")
      */
@@ -98,7 +98,7 @@ class Recette
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette", "post:recette","read:categorie"})
+     * @Groups({"read:recette", "post:recette","read:categorie","read:ingredient"})
      *
      * @OA\Property(type="integer")
      */
@@ -106,7 +106,7 @@ class Recette
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"read:recette", "post:recette","read:categorie"})
+     * @Groups({"read:recette", "post:recette","read:categorie","read:ingredient"})
      * @Assert\Range(min="10")
      * @OA\Property(type="integer")
      */
@@ -114,7 +114,7 @@ class Recette
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"read:recette","read:categorie"})
+     * @Groups({"read:recette","read:categorie","read:ingredient"})
      *
      * @OA\Property(type="string", format="date-time")
      */
@@ -122,7 +122,7 @@ class Recette
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:recette", "post:recette","read:categorie"})
+     * @Groups({"read:recette", "post:recette","read:categorie","read:ingredient"})
      * @Assert\NotBlank(message="Ce champ ne peut pas être vide.")
      * @OA\Property(type="string")
      */
@@ -130,7 +130,7 @@ class Recette
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"read:recette", "post:recette","read:categorie"})
+     * @Groups({"read:recette", "post:recette","read:categorie","read:ingredient"})
      * @OA\Property(type="boolean")
      */
     private $public;
@@ -138,7 +138,7 @@ class Recette
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="recettes")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"read:recette", "post:recette","read:categorie"})
+     * @Groups({"read:recette", "post:recette","read:categorie","read:ingredient"})
      *
      * @OA\Property (type="object", ref="#/components/schemas/UserGetCollectionRecette")
      */
@@ -146,16 +146,22 @@ class Recette
 
     /**
      * @ORM\ManyToMany(targetEntity=Categorie::class, mappedBy="recettes")
-     * @Groups({"read:recette", "post:recette"})
+     * @Groups({"read:recette", "post:recette", "read:ingredient"})
      *
      * @OA\Property(type="array", @OA\Items(ref="#/components/schemas/Categorie"))
      */
     private $categories;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Ingredient::class, mappedBy="recettes")
+     */
+    private $ingredients;
+
     public function __construct()
     {
         $this->dateCreation = new \DateTime('now');
         $this->categories = new ArrayCollection();
+        $this->ingredients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -269,6 +275,33 @@ class Recette
     {
         if ($this->categories->removeElement($category)) {
             $category->removeRecette($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Ingredient[]
+     */
+    public function getIngredients(): Collection
+    {
+        return $this->ingredients;
+    }
+
+    public function addIngredient(Ingredient $ingredient): self
+    {
+        if (!$this->ingredients->contains($ingredient)) {
+            $this->ingredients[] = $ingredient;
+            $ingredient->addRecette($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIngredient(Ingredient $ingredient): self
+    {
+        if ($this->ingredients->removeElement($ingredient)) {
+            $ingredient->removeRecette($this);
         }
 
         return $this;

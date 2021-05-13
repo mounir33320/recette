@@ -154,6 +154,31 @@ paths:
           $ref: '#/components/responses/notFound'
         '401':
           $ref: '#/components/responses/unauthorized'
+  /ingredients:
+    get:
+      tags:
+        - Ingredients
+      summary: 'Collection of Ingredients'
+      description: 'Get a collection of Ingredients'
+      operationId: 'App\Controller\IngredientController::index'
+      parameters:
+        -
+          $ref: '#/components/parameters/orderBy[nom]'
+        -
+          $ref: '#/components/parameters/limit'
+        -
+          $ref: '#/components/parameters/query'
+      responses:
+        '200':
+          description: 'Get a collection of Ingredients'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recette'
+        '404':
+          $ref: '#/components/responses/notFound'
   /recettes:
     get:
       tags:
@@ -494,8 +519,8 @@ paths:
     get:
       tags:
         - User
-      summary: 'Deactivate an User'
-      description: 'Deactivate an User'
+      summary: 'Deactivate a User'
+      description: 'Deactivate a User'
       operationId: 'App\Controller\UserController::deactivate'
       parameters:
         -
@@ -520,8 +545,8 @@ paths:
     get:
       tags:
         - User
-      summary: 'Activate an User'
-      description: 'Activate an User'
+      summary: 'Activate a User'
+      description: 'Activate a User'
       operationId: 'App\Controller\UserController::activate'
       parameters:
         -
